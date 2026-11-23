@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.4 — 2026-11-23
+
+- **Fixed:** Instagram stories said *You need to log in* even when signed in. Instagram refuses story requests that don't come from a real browser, so Grabbit now asks through the same built-in browser you signed in with
+- Clearer Instagram messages: no story right now, sign in again, Instagram busy, post not available
+- Sign-in waits a moment for Instagram to finish before closing, so the saved login is complete
+
 ## 1.0.3 — 2026-11-23
 
 - **Fixed:** 1.0.2 couldn't be installed on some phones ("App not installed"). Grabbit no longer asks for the *install other apps* permission: **Update** now downloads the new version through your browser, and you tap the download to install it

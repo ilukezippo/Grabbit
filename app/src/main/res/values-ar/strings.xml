@@ -113,4 +113,9 @@
     <string name="upd_latest">لديك أحدث إصدار (%s)</string>
     <string name="upd_auto">يتحقق Grabbit من وجود إصدار جديد على GitHub عند تشغيله.</string>
     <string name="upd_whats_new">ما الجديد</string>
+    <string name="err_ig_no_story">لا توجد قصة لـ @%s يمكن تنزيلها الآن. تختفي القصص بعد ٢٤ ساعة.</string>
+    <string name="err_ig_session">لم يقبل إنستغرام تسجيل الدخول. اذهب إلى الإعدادات ← حساب إنستغرام، واضغط «تسجيل الخروج» ثم سجّل الدخول مجددًا.</string>
+    <string name="err_ig_busy">إنستغرام يحدّ من الطلبات الآن. حاول مرة أخرى بعد بضع دقائق.</string>
+    <string name="err_ig_gone">هذا المنشور غير متاح. ربما حُذف، أو أن الحساب خاص ولا تتابعه.</string>
+    <string name="err_ig_failed">لم يُرجع إنستغرام هذا المحتوى. %s</string>
 </resources>

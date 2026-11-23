@@ -3,31 +3,22 @@ package com.ilukezippo.grabbit.instagram
 import android.content.Context
 import com.ilukezippo.grabbit.core.IgTarget
 import com.ilukezippo.grabbit.core.InstagramIds
-import com.ilukezippo.grabbit.core.NetscapeCookies
 import com.ilukezippo.grabbit.engine.DirectItem
-import com.ilukezippo.grabbit.engine.Http
 import com.ilukezippo.grabbit.engine.MediaInfo
 import org.json.JSONObject
 
+class IgNoStories(val user: String) : Exception("No active stories for @$user")
+
 /** Uses the signed-in web session to read posts, carousels (photos + videos) and stories. */
 class InstagramClient(private val ctx: Context) {
-    private val cookie = InstagramSession.header(ctx) ?: ""
-    private val headers = mapOf(
-        "Cookie" to cookie,
-        "X-IG-App-ID" to "936619743392459",
-        "X-CSRFToken" to (NetscapeCookies.value(cookie, "csrftoken") ?: ""),
-        "X-Requested-With" to "XMLHttpRequest",
-        "Referer" to "https://www.instagram.com/",
-    )
+    private suspend fun api(path: String) = InstagramWeb.api(ctx, path)
 
-    private fun api(path: String) = JSONObject(Http.get("https://www.instagram.com/api/v1/$path", headers, Http.DESKTOP_UA))
-
-    fun resolve(target: IgTarget, url: String): MediaInfo = when (target) {
+    suspend fun resolve(target: IgTarget, url: String): MediaInfo = when (target) {
         is IgTarget.Post -> post(target.shortcode, url)
         is IgTarget.Story -> story(target.username, target.mediaId, url)
     }
 
-    private fun post(shortcode: String, url: String): MediaInfo {
+    private suspend fun post(shortcode: String, url: String): MediaInfo {
         val item = api("media/${InstagramIds.shortcodeToMediaId(shortcode)}/info/").getJSONArray("items").getJSONObject(0)
         val carousel = item.optJSONArray("carousel_media")
         val items = if (carousel != null) (0 until carousel.length()).map { toDirect(carousel.getJSONObject(it)) } else listOf(toDirect(item))
@@ -37,17 +28,17 @@ class InstagramClient(private val ctx: Context) {
             item.optDouble("video_duration", 0.0).toInt(), user, "Instagram", emptyList(), false, items.size, items)
     }
 
-    private fun story(username: String, mediaId: String?, url: String): MediaInfo {
+    private suspend fun story(username: String, mediaId: String?, url: String): MediaInfo {
         val userId = api("users/web_profile_info/?username=$username").getJSONObject("data").getJSONObject("user").getString("id")
         val reels = api("feed/reels_media/?reel_ids=$userId")
         val reel = reels.optJSONObject("reels")?.optJSONObject(userId)
             ?: reels.optJSONArray("reels_media")?.optJSONObject(0)
-            ?: throw IllegalStateException("No active stories")
+            ?: throw IgNoStories(username)
         val arr = reel.getJSONArray("items")
         var list = (0 until arr.length()).map { arr.getJSONObject(it) }
         if (mediaId != null) list = list.filter { it.optString("pk") == mediaId || it.optString("id").startsWith(mediaId) }.ifEmpty { list }
         val items = list.map { toDirect(it) }
-        if (items.isEmpty()) throw IllegalStateException("No active stories")
+        if (items.isEmpty()) throw IgNoStories(username)
         return MediaInfo(url, "${username}_story", items.first().thumb, 0, username, "Instagram Story", emptyList(), false, items.size, items)
     }
 

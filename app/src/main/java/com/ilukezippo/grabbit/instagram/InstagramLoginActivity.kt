@@ -37,7 +37,13 @@ class InstagramLoginActivity : AppCompatActivity() {
         val header = CookieManager.getInstance().getCookie("https://www.instagram.com") ?: return
         if (NetscapeCookies.value(header, "sessionid") == null) return
         done = true
+        // Give Instagram a moment to finish setting its cookies (csrftoken, ds_user_id…) before saving.
+        window.decorView.postDelayed({ finishLogin() }, 2500)
+    }
+
+    private fun finishLogin() {
         CookieManager.getInstance().flush()
+        val header = CookieManager.getInstance().getCookie("https://www.instagram.com") ?: return
         InstagramSession.save(this, header)
         InstagramSession.saveUsername(this, NetscapeCookies.value(header, "ds_user_id")?.let { "id $it" })
         Toast.makeText(this, R.string.ig_login_ok, Toast.LENGTH_SHORT).show()

@@ -109,4 +109,9 @@
     <string name="upd_latest">You have the latest version (%s)</string>
     <string name="upd_auto">Grabbit checks GitHub for a new version when it starts.</string>
     <string name="upd_whats_new">What\'s new</string>
+    <string name="err_ig_no_story">@%s has no story to download right now. Stories disappear after 24 hours.</string>
+    <string name="err_ig_session">Instagram didn\'t accept the sign-in. Go to Settings → Instagram account, tap Sign out, then sign in again.</string>
+    <string name="err_ig_busy">Instagram is limiting requests right now. Try again in a few minutes.</string>
+    <string name="err_ig_gone">This post isn\'t available. It may have been deleted, or the account is private and you don\'t follow it.</string>
+    <string name="err_ig_failed">Instagram didn\'t return this. %s</string>
 </resources>
