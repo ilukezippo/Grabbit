@@ -103,4 +103,16 @@
     <string name="err_ig_login_stories">القصص تتطلب تسجيل الدخول إلى إنستغرام. اذهب إلى الإعدادات ← حساب إنستغرام.</string>
     <string name="err_unsupported">هذا الرابط غير مدعوم.</string>
     <string name="err_no_link">لم يُعثر على رابط في النص.</string>
+    <string name="upd_title">يتوفر Grabbit %s</string>
+    <string name="upd_desc">لديك الإصدار %s. حدّث للحصول على أحدث الإصلاحات والميزات.</string>
+    <string name="upd_now">تحديث</string>
+    <string name="upd_downloading">جارٍ تنزيل التحديث… %d%%</string>
+    <string name="upd_allow">اسمح لـ Grabbit بتثبيت التحديثات، ثم اضغط «تحديث» مرة أخرى.</string>
+    <string name="upd_failed">فشل التحديث: %s</string>
+    <string name="upd_section">تحديثات التطبيق</string>
+    <string name="upd_check">البحث عن تحديثات</string>
+    <string name="upd_checking">جارٍ البحث…</string>
+    <string name="upd_latest">لديك أحدث إصدار (%s)</string>
+    <string name="upd_auto">يتحقق Grabbit من وجود إصدار جديد على GitHub عند تشغيله.</string>
+    <string name="upd_whats_new">ما الجديد</string>
 </resources>

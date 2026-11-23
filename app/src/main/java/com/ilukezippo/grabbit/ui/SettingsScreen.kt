@@ -32,6 +32,7 @@ import com.ilukezippo.grabbit.engine.Engine
 import com.ilukezippo.grabbit.engine.EngineState
 import com.ilukezippo.grabbit.instagram.InstagramLoginActivity
 import com.ilukezippo.grabbit.instagram.InstagramSession
+import com.ilukezippo.grabbit.update.AppUpdater
 import kotlinx.coroutines.launch
 
 @Composable
@@ -96,6 +97,29 @@ fun SettingsScreen() {
                 TextButton({ InstagramSession.logout(ctx); igIn = false }) { Text(stringResource(R.string.ig_logout), color = G.red) }
             } else GradientButton({ igLogin.launch(Intent(ctx, InstagramLoginActivity::class.java)) }, Modifier.fillMaxWidth()) {
                 Icon(Icons.Rounded.Login, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.ig_connect))
+            }
+        }
+
+        Section(Icons.Rounded.SystemUpdate, stringResource(R.string.upd_section)) {
+            val upd by AppUpdater.available.collectAsStateWithLifecycle()
+            var checking by remember { mutableStateOf(false) }
+            var checkMsg by remember { mutableStateOf<String?>(null) }
+            upd?.let { UpdateBanner(it) }
+            if (upd == null) {
+                Text(stringResource(R.string.upd_auto), color = G.muted, fontSize = 13.sp)
+                OutlinedButton({
+                    checking = true; checkMsg = null
+                    scope.launch {
+                        checkMsg = runCatching { AppUpdater.check(ctx, force = true) }.fold(
+                            { if (it == null) ctx.getString(R.string.upd_latest, BuildConfigInfo.versionName(ctx)) else null },
+                            { it.message ?: "Error" })
+                        checking = false
+                    }
+                }, Modifier.fillMaxWidth(), enabled = !checking, shape = RoundedCornerShape(16.dp)) {
+                    if (checking) { CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.upd_checking)) }
+                    else { Icon(Icons.Rounded.Refresh, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.upd_check)) }
+                }
+                checkMsg?.let { Text(it, color = G.muted, fontSize = 13.sp) }
             }
         }
 

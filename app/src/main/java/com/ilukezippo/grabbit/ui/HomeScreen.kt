@@ -36,6 +36,7 @@ import com.ilukezippo.grabbit.R
 import com.ilukezippo.grabbit.core.LinkExtractor
 import com.ilukezippo.grabbit.engine.Engine
 import com.ilukezippo.grabbit.engine.EngineState
+import com.ilukezippo.grabbit.update.AppUpdater
 
 fun clipboardLink(ctx: Context): String? = runCatching {
     val cm = ctx.getSystemService(ClipboardManager::class.java)
@@ -64,6 +65,8 @@ fun HomeScreen(vm: GrabViewModel, onQueued: () -> Unit) {
             Text("Grabbit", style = gradientTitle)
             Text(stringResource(R.string.tagline), color = G.muted, fontSize = 15.sp)
         }
+
+        AppUpdater.available.collectAsStateWithLifecycle().value?.let { UpdateBanner(it) }
 
         // Link box
         Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(G.gradientSoft).padding(1.dp)

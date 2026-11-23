@@ -1,7 +1,10 @@
 # Changelog
 
-## 1.0.1 — 2026-11-23
+## 1.0.2 — 2026-11-23
 
+- **App updates:** Grabbit checks GitHub for a new version when it starts and shows a card with an **Update** button that downloads it and opens the installer. *Check for updates* is in Settings too
+- **Tap a finished download to open it**, anywhere on its card
+- **Video previews:** screen recordings and other videos without a thumbnail show a frame from the video
 - **Fixed:** the big gradient buttons (Sign in to Instagram, Start recording, Grab, Download, Convert) only reacted when you tapped the words in the middle. Now the whole button works
 
 ## 1.0.0 — 2026-11-23

@@ -84,3 +84,22 @@ class FileNamesTest {
         assertEquals(80, FileNames.sanitize("x".repeat(200)).length)
     }
 }
+
+class VersionsTest {
+    @Test fun comparesVersions() {
+        assertTrue(Versions.isNewer("v1.0.2", "1.0.1"))
+        assertTrue(Versions.isNewer("1.1", "1.0.9"))
+        assertTrue(Versions.isNewer("2.0.0", "1.9.9"))
+        assertFalse(Versions.isNewer("v1.0.1", "1.0.1"))
+        assertFalse(Versions.isNewer("1.0.0", "1.0.1"))
+        assertFalse(Versions.isNewer("1.0", "1.0.0"))
+        assertFalse(Versions.isNewer("garbage", "1.0.1"))
+    }
+    @Test fun picksApkForAbi() {
+        val names = listOf("Grabbit-1.0.2-armv7.apk", "Grabbit-1.0.2-arm64.apk", "source.zip")
+        assertEquals("Grabbit-1.0.2-arm64.apk", Versions.pickApk(names, "arm64-v8a"))
+        assertEquals("Grabbit-1.0.2-armv7.apk", Versions.pickApk(names, "armeabi-v7a"))
+        assertEquals("only.apk", Versions.pickApk(listOf("only.apk"), "armeabi-v7a"))
+        assertNull(Versions.pickApk(listOf("notes.txt"), "arm64-v8a"))
+    }
+}

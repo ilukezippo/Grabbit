@@ -101,6 +101,7 @@ Everything that changed is in the [changelog](CHANGELOG.md).
 - **Screen recorder:** records the screen with the sound apps play (Android 10+), with a floating bubble that shows the time and stops with a tap
 - **Converter:** turn any video or audio on your phone into MP3, M4A, OPUS, MP4, MKV, WEBM or GIF
 - **Downloads tab:** two at a time, progress and time left, cancel, retry, open and share, kept after a restart
+- **Updates built in:** checks this GitHub page when it starts and offers *Update*, which downloads and installs the new version
 - **Arabic and English**, dark design
 - **No ads, no account, no tracking.** See the [privacy policy](PRIVACY.md)
 
@@ -156,7 +157,8 @@ ui/           Jetpack Compose screens, Arabic and English
 - A link is tried in order: Instagram (when you're signed in), yt-dlp, X photo posts, direct files, then the page's preview picture.
 - Downloads run in a foreground service so Android doesn't stop them when you switch apps; finished files are copied to `Download/Grabbit` through MediaStore.
 - Live recordings are saved as MPEG-TS while recording, so stopping never breaks the file, then turned into MP4.
-- *Update engine* downloads the newest yt-dlp from its GitHub releases. Nothing else is fetched in the background.
+- *Update engine* downloads the newest yt-dlp from its GitHub releases.
+- App update check: one request to `api.github.com/repos/ilukezippo/Grabbit/releases/latest` when the app starts, at most every 6 hours.
 
 ## Known limits
 
@@ -166,7 +168,7 @@ ui/           Jetpack Compose screens, Arabic and English
 
 ## Privacy
 
-No account, no ads, no analytics. Grabbit only connects to the sites of the links you grab, `api.fxtwitter.com` for X photo posts, and GitHub when you tap *Update engine*. See the [privacy policy](PRIVACY.md).
+No account, no ads, no analytics. Grabbit only connects to the sites of the links you grab, `api.fxtwitter.com` for X photo posts, and GitHub to check for app updates and when you tap *Update engine*. See the [privacy policy](PRIVACY.md).
 
 ## License
 

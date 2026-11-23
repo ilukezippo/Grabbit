@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -78,10 +79,15 @@ fun DownloadsScreen() {
 @Composable
 private fun TaskRow(t: DownloadTask) {
     val ctx = LocalContext.current
-    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(G.surface).padding(12.dp)) {
+    val openable = t.status == Status.DONE && t.files.isNotEmpty()
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(G.surface)
+            .then(if (openable) Modifier.clickable { openFile(ctx, t.files.first()) } else Modifier)
+            .padding(12.dp)
+    ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(64.dp, 48.dp).clip(RoundedCornerShape(12.dp)).background(G.surface2), contentAlignment = Alignment.Center) {
-                val thumb = t.spec.thumbnail ?: t.files.firstOrNull { it.mime.startsWith("image") }?.uri
+                val thumb = t.spec.thumbnail ?: t.files.firstOrNull { it.mime.startsWith("image") || it.mime.startsWith("video") }?.uri
                 if (thumb != null) AsyncImage(thumb, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
                 else Icon(if (t.files.firstOrNull()?.mime?.startsWith("audio") == true) Icons.Rounded.MusicNote else Icons.Rounded.Movie, null, tint = G.muted)
             }

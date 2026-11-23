@@ -99,4 +99,16 @@
     <string name="err_ig_login_stories">Stories need an Instagram sign-in. Go to Settings → Instagram account.</string>
     <string name="err_unsupported">This link isn\'t supported.</string>
     <string name="err_no_link">No link found in that text.</string>
+    <string name="upd_title">Grabbit %s is available</string>
+    <string name="upd_desc">You have %s. Update to get the newest fixes and features.</string>
+    <string name="upd_now">Update</string>
+    <string name="upd_downloading">Downloading update… %d%%</string>
+    <string name="upd_allow">Allow Grabbit to install updates, then tap Update again.</string>
+    <string name="upd_failed">Update failed: %s</string>
+    <string name="upd_section">App updates</string>
+    <string name="upd_check">Check for updates</string>
+    <string name="upd_checking">Checking…</string>
+    <string name="upd_latest">You have the latest version (%s)</string>
+    <string name="upd_auto">Grabbit checks GitHub for a new version when it starts.</string>
+    <string name="upd_whats_new">What\'s new</string>
 </resources>

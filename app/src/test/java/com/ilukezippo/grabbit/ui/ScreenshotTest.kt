@@ -28,5 +28,8 @@ class ScreenshotTest {
     @Test fun panelCarousel() = shot("panel_carousel") {
         GrabPanel(video.copy(site = "Instagram", entryCount = 4, durationSec = 0, direct = List(4) { DirectItem("u$it", it == 2) })) {}
     }
+    @Test fun updateBanner() = shot("update_banner") {
+        UpdateBanner(com.ilukezippo.grabbit.update.AppUpdate("1.0.3", "Grabbit-1.0.3-arm64.apk", "u", "p", ""))
+    }
     @Test fun home() = captureRoboImage("build/shots/home.png") { GrabbitTheme { Box(Modifier.background(G.bg).fillMaxSize()) { ToolsScreen() } } }
 }
