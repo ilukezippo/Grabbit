@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 — 2026-11-23
+
+- **Fixed:** the big gradient buttons (Sign in to Instagram, Start recording, Grab, Download, Convert) only reacted when you tapped the words in the middle. Now the whole button works
+
 ## 1.0.0 — 2026-11-23
 
 First release.

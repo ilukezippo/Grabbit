@@ -1,6 +1,15 @@
 package com.ilukezippo.grabbit.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
@@ -60,7 +69,7 @@ fun GrabbitTheme(content: @Composable () -> Unit) {
     )
 }
 
-/** Pill button filled with the brand gradient. */
+/** Pill button filled with the brand gradient. The whole bar is tappable, not just the label. */
 @Composable
 fun GradientButton(
     onClick: () -> Unit,
@@ -69,20 +78,20 @@ fun GradientButton(
     content: @Composable RowScope.() -> Unit,
 ) {
     val shape = RoundedCornerShape(18.dp)
-    Box(
+    Row(
         modifier
             .defaultMinSize(minHeight = 54.dp)
             .alpha(if (enabled) 1f else .45f)
-            .background(G.gradient, shape),
-        contentAlignment = Alignment.Center,
+            .clip(shape)
+            .background(G.gradient)
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+            .padding(horizontal = 22.dp, vertical = 14.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Button(
-            onClick = onClick, enabled = enabled, shape = shape,
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, disabledContainerColor = Color.Transparent, contentColor = Color.White, disabledContentColor = Color.White),
-            contentPadding = PaddingValues(horizontal = 22.dp, vertical = 14.dp),
-            modifier = Modifier.defaultMinSize(minHeight = 54.dp),
-            content = content,
-        )
+        CompositionLocalProvider(LocalContentColor provides Color.White, LocalTextStyle provides MaterialTheme.typography.labelLarge.copy(fontSize = 15.sp)) {
+            content()
+        }
     }
 }
 
