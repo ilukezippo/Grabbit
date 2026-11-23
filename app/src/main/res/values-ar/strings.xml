@@ -72,7 +72,7 @@
     <string name="stop">إيقاف</string>
 
     <string name="conv_title">تحويل ملف</string>
-    <string name="conv_desc">حوّل أي فيديو أو صوت على جوالك إلى صيغة أخرى.</string>
+    <string name="conv_desc">حوّل أي فيديو أو أغنية أو صورة على جوالك إلى صيغة أخرى: MP3 وMP4 وGIF وJPG وPNG وWebP وPDF…</string>
     <string name="conv_pick">اختر ملفًا</string>
     <string name="conv_to">تحويل إلى</string>
     <string name="conv_start">تحويل</string>
@@ -139,7 +139,6 @@
     <string name="cleared_toast">أُزيلت من القائمة. الملفات ما زالت في Download/Grabbit.</string>
     <string name="deleted_toast">حُذفت من جوالك.</string>
     <string name="convert_to_title">تحويل إلى</string>
-    <string name="convert_none">اختر فيديوهات أو أغاني لتحويلها.</string>
     <string name="convert_started">جارٍ التحويل. ستظهر الملفات الجديدة في هذه القائمة.</string>
     <string name="edit_hint">«مسح» يزيل العناصر من هذه القائمة فقط. «حذف» يحذف الملفات من جوالك أيضًا.</string>
     <string name="when_grab">عند جلب رابط</string>
@@ -177,4 +176,26 @@
     <string name="shortcut_text">اضغط «تسجيل» لبدء تسجيل الشاشة</string>
     <string name="shortcut_record">تسجيل</string>
     <string name="shortcut_open">فتح Grabbit</string>
+    <string name="conv_media">الفيديوهات والأغاني إلى</string>
+    <string name="conv_images">الصور إلى</string>
+    <string name="convert_none">اختر فيديوهات أو أغاني أو صورًا لتحويلها.</string>
+    <string name="set_speed">سرعة التنزيل</string>
+    <string name="fast_title">تنزيل سريع</string>
+    <string name="fast_hint">يستخدم عدة اتصالات في الوقت نفسه. إذا لم يقبله موقع ما، يعيد Grabbit المحاولة بالطريقة العادية تلقائيًا.</string>
+    <string name="parallel_title">عدد التنزيلات في الوقت نفسه</string>
+    <string name="tour_skip">تخطٍّ</string>
+    <string name="tour_next">التالي</string>
+    <string name="tour_start">ابدأ التنزيل</string>
+    <string name="tour_replay">طريقة استخدام Grabbit</string>
+    <string name="tour_share_with">مشاركة مع</string>
+    <string name="tour1_title">شارك الرابط مع Grabbit</string>
+    <string name="tour1_text">في يوتيوب أو إنستغرام أو تيك توك أو أي تطبيق، اضغط «مشاركة» واختر Grabbit. أو انسخ الرابط وافتح Grabbit.</string>
+    <string name="tour2_title">اختر الجودة</string>
+    <string name="tour2_text">من 144p إلى 4K بصيغة MP4 أو MKV أو WEBM، أو الصوت فقط بصيغة MP3. يتذكّر Grabbit اختيارك.</string>
+    <string name="tour3_title">كل شيء في التنزيلات</string>
+    <string name="tour3_text">اضغط على الملف لفتحه. اضغط مطولًا لتحديد عدة ملفات وتحويلها أو مسحها أو حذفها.</string>
+    <string name="tour4_title">سجّل شاشتك</string>
+    <string name="tour4_text">اضغط «تسجيل» في الإشعار أو زر الإعدادات السريعة، من أي تطبيق، مع الصوت وعدّ تنازلي.</string>
+    <string name="tour5_title">اجعله على ذوقك</string>
+    <string name="tour5_text">نزّل مباشرة بجودتك المفضلة، وسجّل الدخول إلى إنستغرام للقصص، وأبقِ التنزيل سريعًا.</string>
 </resources>

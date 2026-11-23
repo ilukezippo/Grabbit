@@ -23,10 +23,15 @@ object Engine {
     private val _state = MutableStateFlow<EngineState>(EngineState.Loading)
     val state: StateFlow<EngineState> = _state
 
+    /** The multi-connection downloader is available. */
+    @Volatile var aria2Ready = false
+        private set
+
     fun init(ctx: Context) {
         _state.value = try {
             YoutubeDL.getInstance().init(ctx)
             FFmpeg.getInstance().init(ctx)
+            aria2Ready = runCatching { com.yausername.aria2c.Aria2c.getInstance().init(ctx) }.isSuccess
             EngineState.Ready(YoutubeDL.getInstance().versionName(ctx) ?: YoutubeDL.getInstance().version(ctx) ?: "?")
         } catch (e: Throwable) {
             EngineState.Failed(e.message ?: e.toString())

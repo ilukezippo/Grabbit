@@ -33,6 +33,15 @@ class Prefs(ctx: Context) {
     /** Keep the "Screen recorder · Record" notification in the shade. */
     var recShortcut: Boolean
         get() = sp.getBoolean("recShortcut", true); set(v) = sp.edit().putBoolean("recShortcut", v).apply()
+    /** Several connections per file and several pieces at once. */
+    var fastDownloads: Boolean
+        get() = sp.getBoolean("fast", true); set(v) = sp.edit().putBoolean("fast", v).apply()
+    /** How many downloads run at the same time (1–4). */
+    var parallel: Int
+        get() = sp.getInt("parallel", 2).coerceIn(1, 4); set(v) = sp.edit().putInt("parallel", v.coerceIn(1, 4)).apply()
+    /** The first-launch walkthrough has been seen. */
+    var tourSeen: Boolean
+        get() = sp.getBoolean("tourSeen", false); set(v) = sp.edit().putBoolean("tourSeen", v).apply()
     var recordAudio: Boolean
         get() = sp.getBoolean("recAudio", true); set(v) = sp.edit().putBoolean("recAudio", v).apply()
 }

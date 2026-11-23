@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1 — 2026-11-23
+
+- **Faster downloads:** several connections per file (aria2c) and 8 pieces at once for streamed videos. YouTube and others limit each connection's speed, so this is much faster. If a site doesn't like it, Grabbit retries the normal way by itself. Turn it off in Settings → Download speed
+- **Downloads at the same time:** choose 1 to 4
+- **Convert pictures:** JPG, PNG, WebP, HEIC, AVIF… to JPG, PNG, WebP or PDF, in Tools and from Downloads (Edit → Convert)
+- **Walkthrough on first launch:** a short animated tour of sharing, quality, Downloads, recording and settings. Replay it from Settings → About → *How to use Grabbit*
+- Also since 1.0: record from the notification shade and a Quick Settings tile with a countdown, edit mode in Downloads, ask-or-download-right-away, download-complete notifications, Instagram stories, in-app update check
+
 ## 1.0.7 — 2026-11-23
 
 - **Record from the notification shade:** a quiet *Screen recorder* notification stays there with a **Record** button (turn it off in Tools)

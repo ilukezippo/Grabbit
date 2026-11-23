@@ -125,3 +125,38 @@ class DefaultChoiceTest {
         assertEquals("MP3", DefaultChoice.label(Choice.Audio(AudioFormat.MP3)))
     }
 }
+
+class SinglePagePdfTest {
+    @Test fun writesAValidLookingPdf() {
+        val jpeg = byteArrayOf(0xFF.toByte(), 0xD8.toByte(), 1, 2, 3, 0xFF.toByte(), 0xD9.toByte())
+        val pdf = String(SinglePagePdf.withJpeg(jpeg, 640, 480), Charsets.ISO_8859_1)
+        assertTrue(pdf.startsWith("%PDF-1.4"))
+        assertTrue(pdf.contains("/MediaBox [0 0 640 480]"))
+        assertTrue(pdf.contains("/Filter /DCTDecode /Length 7"))
+        assertTrue(pdf.trimEnd().endsWith("%%EOF"))
+        // every xref offset must point at "N 0 obj"
+        val xref = pdf.substring(pdf.indexOf("xref\n"))
+        val offsets = Regex("""(\d{10}) 00000 n""").findAll(xref).map { it.groupValues[1].toInt() }.toList()
+        assertEquals(5, offsets.size)
+        offsets.forEachIndexed { i, off -> assertTrue(pdf.startsWith("${i + 1} 0 obj", off)) }
+        val start = Regex("""startxref\n(\d+)""").find(pdf)!!.groupValues[1].toInt()
+        assertTrue(pdf.startsWith("xref", start))
+    }
+}
+
+class SpeedArgsTest {
+    @Test fun fastUsesAria2ForPlainFilesAndParallelFragments() {
+        val a = SpeedArgs.args(fast = true, aria2Ready = true, live = false)
+        assertEquals("8", a[a.indexOf("-N") + 1])
+        assertTrue(a.containsAll(listOf("--downloader", "dash,m3u8:native", "libaria2c.so")))
+        assertTrue(a.any { it.startsWith("aria2c:") && "-x 8" in it && "-s 8" in it })
+    }
+    @Test fun fastWithoutAria2StillSplitsFragments() {
+        val a = SpeedArgs.args(fast = true, aria2Ready = false, live = false)
+        assertEquals(listOf("-N", "8", "--http-chunk-size", "10M"), a)
+    }
+    @Test fun offOrLiveAddsNothing() {
+        assertTrue(SpeedArgs.args(fast = false, aria2Ready = true, live = false).isEmpty())
+        assertTrue(SpeedArgs.args(fast = true, aria2Ready = true, live = true).isEmpty())
+    }
+}

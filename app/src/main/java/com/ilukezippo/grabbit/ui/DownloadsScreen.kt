@@ -50,6 +50,7 @@ import com.ilukezippo.grabbit.download.DownloadTask
 import com.ilukezippo.grabbit.download.Downloads
 import com.ilukezippo.grabbit.download.SavedFile
 import com.ilukezippo.grabbit.download.Status
+import com.ilukezippo.grabbit.engine.ImageConverter
 
 fun openFile(ctx: Context, f: SavedFile) {
     val i = Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(f.uri), f.mime).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -133,7 +134,7 @@ fun DownloadsScreen(previewEditing: Boolean = false, previewSelected: Set<String
 
         if (editing) {
             val sel = tasks.filter { it.id in selected }
-            val convertible = sel.any { t -> t.status == Status.DONE && t.files.any { it.mime.startsWith("video") || it.mime.startsWith("audio") } }
+            val convertible = sel.any { t -> t.status == Status.DONE && t.files.any { Downloads.isMedia(it.mime) || ImageConverter.isImage(it.mime) } }
             Row(Modifier.fillMaxWidth().background(G.surface).padding(horizontal = 12.dp, vertical = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
                 BarAction(Icons.Rounded.Transform, stringResource(R.string.act_convert), enabled = convertible) { showConvert = true }
                 BarAction(Icons.Rounded.ClearAll, stringResource(R.string.act_clear), enabled = sel.isNotEmpty()) {
@@ -178,15 +179,28 @@ fun DownloadsScreen(previewEditing: Boolean = false, previewSelected: Set<String
     }
 
     if (showConvert) {
-        var target by remember { mutableStateOf("mp3") }
+        val files = tasks.filter { it.id in selected && it.status == Status.DONE }.flatMap { it.files }
+        val hasMedia = files.any { Downloads.isMedia(it.mime) }
+        val hasImages = files.any { ImageConverter.isImage(it.mime) }
+        var mediaTarget by remember { mutableStateOf("mp3") }
+        var imageTarget by remember { mutableStateOf("jpg") }
         ModalBottomSheet(onDismissRequest = { showConvert = false }, containerColor = G.bg) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 28.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 Text(stringResource(R.string.convert_to_title), style = MaterialTheme.typography.titleLarge)
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf("mp3", "m4a", "opus", "mp4", "mkv", "webm", "gif").forEach { t -> ChoiceChip(t.uppercase(), target == t) { target = t } }
+                if (hasMedia) {
+                    SectionLabel(stringResource(R.string.conv_media))
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        MEDIA_TARGETS.forEach { t -> ChoiceChip(t.uppercase(), mediaTarget == t) { mediaTarget = t } }
+                    }
+                }
+                if (hasImages) {
+                    SectionLabel(stringResource(R.string.conv_images))
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ImageConverter.TARGETS.forEach { t -> ChoiceChip(t.uppercase(), imageTarget == t) { imageTarget = t } }
+                    }
                 }
                 GradientButton({
-                    Downloads.convert(ctx, selected, target)
+                    Downloads.convert(ctx, selected, mediaTarget.takeIf { hasMedia }, imageTarget.takeIf { hasImages })
                     Toast.makeText(ctx, R.string.convert_started, Toast.LENGTH_SHORT).show()
                     showConvert = false
                     exitEdit()
@@ -197,6 +211,8 @@ fun DownloadsScreen(previewEditing: Boolean = false, previewSelected: Set<String
         }
     }
 }
+
+val MEDIA_TARGETS = listOf("mp3", "m4a", "opus", "mp4", "mkv", "webm", "gif")
 
 @Composable
 private fun BarAction(icon: ImageVector, label: String, enabled: Boolean, tint: androidx.compose.ui.graphics.Color = G.text, onClick: () -> Unit) {

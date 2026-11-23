@@ -65,6 +65,17 @@ class DownloadsEditTest {
         assertEquals(listOf(f("2").uri), Downloads.lastDeleted)
     }
 
+    @Test fun convertSheetOffersPictureFormatsForPictures() {
+        val pic = SavedFile("content://media/external/downloads/9", "brunch.jpg", "image/jpeg", 1000)
+        Downloads.setForPreview(listOf(task("9", "Brunch photo", pic)))
+        rule.onNodeWithText("Brunch photo").performTouchInput { longClick() }
+        rule.onNodeWithText("Convert").performClick()
+        rule.onNodeWithText("PICTURES TO").assertExists()
+        rule.onNodeWithText("PDF").assertExists()
+        rule.onNodeWithText("VIDEOS AND SONGS TO").assertDoesNotExist()
+        rule.onNodeWithText("WEBP").performClick()
+    }
+
     @Test fun selectAllThenClear() {
         rule.onNodeWithText("Edit").performClick()
         rule.onNodeWithText("Select all").performClick()

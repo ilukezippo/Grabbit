@@ -9,8 +9,10 @@ import com.ilukezippo.grabbit.Notifications
 import com.ilukezippo.grabbit.core.Choice
 import com.ilukezippo.grabbit.core.FileNames
 import com.ilukezippo.grabbit.core.FormatSelector
+import com.ilukezippo.grabbit.core.SpeedArgs
 import com.ilukezippo.grabbit.engine.Engine
 import com.ilukezippo.grabbit.engine.FFmpegRunner
+import com.ilukezippo.grabbit.engine.ImageConverter
 import com.ilukezippo.grabbit.engine.Http
 import com.yausername.youtubedl_android.YoutubeDL
 import kotlinx.coroutines.Dispatchers
@@ -21,8 +23,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
+import kotlinx.coroutines.sync.withLock
 import okhttp3.Request
 import org.json.JSONArray
 import org.json.JSONObject
@@ -37,14 +38,24 @@ object Downloads {
     val tasks: StateFlow<List<DownloadTask>> = _tasks
     private val jobs = ConcurrentHashMap<String, Job>()
     private val stopAndSave = ConcurrentHashMap.newKeySet<String>()
-    private val gate = Semaphore(2)
+    /** Lets [Prefs.parallel] downloads run at once; changes apply to the next download that starts. */
+    private val gateLock = kotlinx.coroutines.sync.Mutex()
+    @Volatile private var runningNow = 0
+    private suspend fun <T> gated(ctx: Context, block: suspend () -> T): T {
+        while (true) {
+            val ok = gateLock.withLock { if (runningNow < com.ilukezippo.grabbit.ui.Prefs(ctx).parallel) { runningNow++; true } else false }
+            if (ok) break
+            kotlinx.coroutines.delay(300)
+        }
+        try { return block() } finally { gateLock.withLock { runningNow-- } }
+    }
 
     fun enqueue(ctx: Context, spec: DownloadSpec): String {
         val task = DownloadTask(UUID.randomUUID().toString().take(8), spec)
         _tasks.update { listOf(task) + it }
         ContextCompat.startForegroundService(ctx, Intent(ctx, DownloadService::class.java))
         val app = ctx.applicationContext as GrabbitApp
-        jobs[task.id] = app.scope.launch { gate.withPermit { run(app, task.id) } }
+        jobs[task.id] = app.scope.launch { gated(app) { run(app, task.id) } }
         return task.id
     }
 
@@ -120,15 +131,22 @@ object Downloads {
         DeleteOutcome(needConsent, consentIds)
     }
 
-    /** Converts each item's media files to [target] ("mp3", "mp4"…) as new entries in the list. */
-    fun convert(ctx: Context, ids: Set<String>, target: String) {
+    /** Converts the items' videos/songs to [mediaTarget] and pictures to [imageTarget], as new entries in the list. */
+    fun convert(ctx: Context, ids: Set<String>, mediaTarget: String?, imageTarget: String?) {
         _tasks.value.filter { it.id in ids && it.status == Status.DONE }.flatMap { t -> t.files.map { t to it } }
-            .filter { (_, f) -> f.mime.startsWith("video") || f.mime.startsWith("audio") }
             .forEach { (t, f) ->
-                enqueue(ctx, DownloadSpec(f.uri, "${f.name.substringBeforeLast('.')} → ${target.uppercase()}", t.spec.thumbnail, null,
+                val target = when {
+                    ImageConverter.isImage(f.mime) -> imageTarget
+                    isMedia(f.mime) -> mediaTarget
+                    else -> null
+                } ?: return@forEach
+                enqueue(ctx, DownloadSpec(f.uri, "${f.name.substringBeforeLast('.')} → ${target.uppercase()}", t.spec.thumbnail ?: f.uri.takeIf { ImageConverter.isImage(f.mime) }, null,
                     convertFrom = f, convertTo = target))
             }
     }
+
+    /** Video, audio or an animated GIF: things FFmpeg converts. */
+    fun isMedia(mime: String) = mime.startsWith("video") || mime.startsWith("audio") || mime == "image/gif"
 
     private suspend fun convertFile(app: GrabbitApp, task: DownloadTask, tmp: File): List<File> {
         val src = task.spec.convertFrom ?: error("Nothing to convert")
@@ -137,7 +155,8 @@ object Downloads {
         app.contentResolver.openInputStream(Uri.parse(src.uri))!!.use { i -> input.outputStream().use { i.copyTo(it) } }
         val out = File(tmp, FileNames.sanitize(src.name.substringBeforeLast('.')) + "." + target)
         set(task.id) { it.copy(progress = 0f, detail = "") }
-        FFmpegRunner.run(app, FFmpegRunner.convertArgs(input, out)) { p -> set(task.id) { it.copy(progress = p) } }
+        if (ImageConverter.isImage(src.mime)) ImageConverter.convert(app, input, out)
+        else FFmpegRunner.run(app, FFmpegRunner.convertArgs(input, out)) { p -> set(task.id) { it.copy(progress = p) } }
         input.delete()
         return listOf(out)
     }
@@ -190,12 +209,26 @@ object Downloads {
     }
 
     private suspend fun fetchWithYtDlp(app: GrabbitApp, task: DownloadTask, tmp: File): List<File> {
+        val fast = com.ilukezippo.grabbit.ui.Prefs(app).fastDownloads && !task.spec.isLive
+        return try {
+            fetchWithYtDlp(app, task, tmp, fast)
+        } catch (e: Throwable) {
+            // If the fast way fails for this site, try once more the plain way before giving up.
+            if (!fast || e is YoutubeDL.CanceledException || e is kotlinx.coroutines.CancellationException || find(task.id)?.status == Status.CANCELED) throw e
+            tmp.listFiles()?.forEach { it.deleteRecursively() }
+            set(task.id) { it.copy(progress = -1f, detail = "") }
+            fetchWithYtDlp(app, task, tmp, fast = false)
+        }
+    }
+
+    private suspend fun fetchWithYtDlp(app: GrabbitApp, task: DownloadTask, tmp: File, fast: Boolean): List<File> {
         Engine.awaitReady()
         val spec = task.spec
         val req = Engine.baseRequest(app, spec.url).apply {
             addOption("-o", File(tmp, "%(title).70B [%(id)s].%(ext)s").absolutePath)
             addOption("--no-playlist")
             addOption("--embed-metadata")
+            SpeedArgs.args(fast, Engine.aria2Ready, spec.isLive).chunked(2).forEach { (k, v) -> addOption(k, v) }
             if (spec.isLive) {
                 val h = (spec.choice as? Choice.Video)?.height
                 addOption("-f", if (h != null) "b[height<=$h]/bv*[height<=$h]+ba/b" else "b/bv*+ba")

@@ -19,8 +19,8 @@ android {
         applicationId = "com.ilukezippo.grabbit"
         minSdk = 24
         targetSdk = 35
-        versionCode = 8
-        versionName = "1.0.7"
+        versionCode = 9
+        versionName = "1.1"
     }
 
     signingConfigs {
@@ -72,6 +72,7 @@ dependencies {
     val ytdl = "0.18.1"
     implementation("io.github.junkfood02.youtubedl-android:library:$ytdl")
     implementation("io.github.junkfood02.youtubedl-android:ffmpeg:$ytdl")
+    implementation("io.github.junkfood02.youtubedl-android:aria2c:$ytdl")
 
     implementation(platform("androidx.compose:compose-bom:2025.05.00"))
     implementation("androidx.compose.ui:ui")

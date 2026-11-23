@@ -39,6 +39,7 @@ import com.ilukezippo.grabbit.core.FileNames
 import com.ilukezippo.grabbit.download.Downloads
 import com.ilukezippo.grabbit.download.MediaSaver
 import com.ilukezippo.grabbit.engine.FFmpegRunner
+import com.ilukezippo.grabbit.engine.ImageConverter
 import com.ilukezippo.grabbit.recorder.ScreenRecordService
 import com.ilukezippo.grabbit.recorder.RecordLauncherActivity
 import com.ilukezippo.grabbit.Notifications
@@ -166,15 +167,20 @@ private fun ConverterCard() {
     var picked by remember { mutableStateOf<Uri?>(null) }
     var name by remember { mutableStateOf("") }
     var target by remember { mutableStateOf("mp3") }
+    var pickedMime by remember { mutableStateOf("") }
     var progress by remember { mutableStateOf<Float?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null) { picked = uri; name = displayName(ctx, uri); message = null }
+        if (uri != null) {
+            picked = uri; name = displayName(ctx, uri); message = null
+            pickedMime = ctx.contentResolver.getType(uri) ?: ""
+            target = if (ImageConverter.isImage(pickedMime)) "jpg" else if (target in ImageConverter.TARGETS) "mp3" else target
+        }
     }
-    val targets = listOf("mp3", "m4a", "opus", "mp4", "mkv", "webm", "gif")
+    val targets = if (ImageConverter.isImage(pickedMime)) ImageConverter.TARGETS else MEDIA_TARGETS
 
     ToolCard(Icons.Rounded.Transform, stringResource(R.string.conv_title), stringResource(R.string.conv_desc)) {
-        OutlinedButton({ picker.launch(arrayOf("video/*", "audio/*")) }, Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), enabled = progress == null) {
+        OutlinedButton({ picker.launch(arrayOf("video/*", "audio/*", "image/*")) }, Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), enabled = progress == null) {
             Icon(Icons.Rounded.FolderOpen, null); Spacer(Modifier.width(8.dp))
             Text(if (picked == null) stringResource(R.string.conv_pick) else name, maxLines = 1)
         }
@@ -196,7 +202,8 @@ private fun ConverterCard() {
                     withContext(Dispatchers.IO) { ctx.contentResolver.openInputStream(src)!!.use { i -> input.outputStream().use { i.copyTo(it) } } }
                     val outName = FileNames.sanitize(name.substringBeforeLast('.')) + "." + target
                     val out = File(work, "out.$target")
-                    FFmpegRunner.run(ctx, FFmpegRunner.convertArgs(input, out)) { progress = it }
+                    if (ImageConverter.isImage(pickedMime)) ImageConverter.convert(ctx, input, out)
+                    else FFmpegRunner.run(ctx, FFmpegRunner.convertArgs(input, out)) { progress = it }
                     val saved = withContext(Dispatchers.IO) { MediaSaver.save(ctx, out, outName) }
                     Downloads.addExternal(ctx, outName, saved)
                     message = ctx.getString(R.string.conv_done)

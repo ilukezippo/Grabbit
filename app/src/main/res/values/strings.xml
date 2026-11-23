@@ -68,7 +68,7 @@
     <string name="stop">Stop</string>
 
     <string name="conv_title">Convert a file</string>
-    <string name="conv_desc">Turn any video or audio on your phone into another format.</string>
+    <string name="conv_desc">Turn any video, song or picture on your phone into another format: MP3, MP4, GIF, JPG, PNG, WebP, PDF…</string>
     <string name="conv_pick">Choose file</string>
     <string name="conv_to">Convert to</string>
     <string name="conv_start">Convert</string>
@@ -131,7 +131,6 @@
     <string name="cleared_toast">Removed from the list. The files are still in Download/Grabbit.</string>
     <string name="deleted_toast">Deleted from your phone.</string>
     <string name="convert_to_title">Convert to</string>
-    <string name="convert_none">Pick videos or songs to convert.</string>
     <string name="convert_started">Converting. The new files will appear in this list.</string>
     <string name="edit_hint">Clear takes items off this list. Delete also removes the files from your phone.</string>
     <string name="when_grab">When I grab a link</string>
@@ -165,4 +164,26 @@
     <string name="shortcut_text">Tap Record to start recording your screen</string>
     <string name="shortcut_record">Record</string>
     <string name="shortcut_open">Open Grabbit</string>
+    <string name="conv_media">Videos and songs to</string>
+    <string name="conv_images">Pictures to</string>
+    <string name="convert_none">Pick videos, songs or pictures to convert.</string>
+    <string name="set_speed">Download speed</string>
+    <string name="fast_title">Fast downloads</string>
+    <string name="fast_hint">Uses several connections at once. If a site doesn\'t like it, Grabbit retries the normal way by itself.</string>
+    <string name="parallel_title">Downloads at the same time</string>
+    <string name="tour_skip">Skip</string>
+    <string name="tour_next">Next</string>
+    <string name="tour_start">Start grabbing</string>
+    <string name="tour_replay">How to use Grabbit</string>
+    <string name="tour_share_with">Share with</string>
+    <string name="tour1_title">Share a link to Grabbit</string>
+    <string name="tour1_text">In YouTube, Instagram, TikTok or any app, tap Share and pick Grabbit. Or copy the link and open Grabbit.</string>
+    <string name="tour2_title">Pick the quality</string>
+    <string name="tour2_text">Choose 144p to 4K, MP4, MKV or WEBM, or just the sound as MP3. Grabbit remembers your choice.</string>
+    <string name="tour3_title">Everything in Downloads</string>
+    <string name="tour3_text">Tap a file to open it. Long-press to select several and convert, clear or delete them.</string>
+    <string name="tour4_title">Record your screen</string>
+    <string name="tour4_text">Tap Record in the notification or the Quick Settings tile, from any app, with sound and a countdown.</string>
+    <string name="tour5_title">Make it yours</string>
+    <string name="tour5_text">Download right away with your favourite quality, sign in to Instagram for stories, and keep downloads fast.</string>
 </resources>

@@ -36,7 +36,15 @@ class MainActivity : AppCompatActivity() {
         setContent {
             GrabbitTheme {
                 var current by tab
-                AppScaffold(vm, current) { current = it }
+                val prefs = remember { Prefs(this@MainActivity) }
+                val replay by TourState.show.collectAsStateWithLifecycle()
+                var showTour by remember { mutableStateOf(!prefs.tourSeen) }
+                Box {
+                    AppScaffold(vm, current) { current = it }
+                    if (showTour || replay) Tour {
+                        prefs.tourSeen = true; showTour = false; TourState.show.value = false
+                    }
+                }
             }
         }
     }

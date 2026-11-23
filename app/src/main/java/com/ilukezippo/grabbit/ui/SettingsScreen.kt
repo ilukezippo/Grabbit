@@ -102,6 +102,22 @@ fun SettingsScreen() {
             }
         }
 
+        Section(Icons.Rounded.Speed, stringResource(R.string.set_speed)) {
+            var fast by remember { mutableStateOf(prefs.fastDownloads) }
+            var parallel by remember { mutableIntStateOf(prefs.parallel) }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.fast_title), fontSize = 14.sp)
+                    Text(stringResource(R.string.fast_hint), color = G.muted, fontSize = 12.sp)
+                }
+                Switch(fast, { fast = it; prefs.fastDownloads = it })
+            }
+            SectionLabel(stringResource(R.string.parallel_title))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                (1..4).forEach { n -> ChoiceChip("$n", parallel == n) { parallel = n; prefs.parallel = n } }
+            }
+        }
+
         Section(Icons.Rounded.CameraAlt, stringResource(R.string.set_instagram)) {
             Text(stringResource(R.string.ig_desc), color = G.muted, fontSize = 13.sp)
             if (igIn) Row(verticalAlignment = Alignment.CenterVertically) {
@@ -156,6 +172,9 @@ fun SettingsScreen() {
 
         Section(Icons.Rounded.Info, stringResource(R.string.about)) {
             Text(stringResource(R.string.about_text, BuildConfigInfo.versionName(ctx)), color = G.muted, fontSize = 13.sp)
+            TextButton({ TourState.show.value = true }) {
+                Icon(Icons.Rounded.PlayCircle, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.tour_replay))
+            }
             TextButton({ ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://ilukezippo.github.io/"))) }) {
                 Icon(Icons.Rounded.Apps, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.more_apps))
             }

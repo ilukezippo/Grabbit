@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ilukezippo/Grabbit/releases/download/v1.0.0/Grabbit-1.0.0-arm64.apk"><img src="assets/download-button.svg" width="340" alt="Download Grabbit for Android"></a>
+  <a href="https://github.com/ilukezippo/Grabbit/releases/latest"><img src="assets/download-button.svg" width="340" alt="Download Grabbit for Android"></a>
 </p>
 
 <p align="center">
@@ -57,13 +57,14 @@ Most "free" video downloaders for Android are stuffed with ads, trackers and pop
 
 Everything is saved to **Download/Grabbit** and listed in the **Downloads** tab, where you can open, share, retry or remove it.
 
-## What's new in 1.0.0
+## What's new in 1.1
 
-- **Any site:** YouTube, Instagram, TikTok, X, Facebook, Snapchat, Reddit, Twitch, Vimeo, Pinterest, SoundCloud and 1,000+ more
-- **Instagram photos, carousels, stories and private posts** you can see, after signing in once inside the app
-- **Live streams** recorded at full quality, plus a **screen recorder** with app sound and a floating stop bubble
-- **Converter** for any video or audio already on your phone
-- **Arabic and English**, with a full right-to-left layout
+- **Faster downloads:** several connections per file and 8 pieces at once for streamed videos, with an automatic fallback if a site doesn't like it
+- **Convert pictures** to JPG, PNG, WebP or PDF, and videos/songs to MP3, MP4, GIF and more, several at once from Downloads
+- **Edit mode in Downloads:** select several to convert, clear from the list, or delete from the phone
+- **Record from anywhere:** a Record button in the notification shade, a Quick Settings tile, and a countdown
+- **Ask or download right away** with your saved quality and format
+- **Instagram stories** through your own sign-in, and a short **walkthrough** on first launch
 
 Everything that changed is in the [changelog](CHANGELOG.md).
 
@@ -99,7 +100,8 @@ Everything that changed is in the [changelog](CHANGELOG.md).
 - **Share sheet:** Share → Grabbit from YouTube, Instagram, TikTok or any app opens a quick download sheet over it
 - **Live streams:** record YouTube Live, Twitch, TikTok Live and more at full quality, saved as MP4
 - **Screen recorder:** records the screen with the sound apps play (Android 10+), with a countdown, a floating bubble that shows the time and stops with a tap, a Record button in the notification shade and a Quick Settings tile
-- **Converter:** turn any video or audio on your phone into MP3, M4A, OPUS, MP4, MKV, WEBM or GIF
+- **Converter:** turn any video or audio into MP3, M4A, OPUS, MP4, MKV, WEBM or GIF, and any picture (JPG, PNG, WebP, HEIC…) into JPG, PNG, WebP or PDF
+- **Fast downloads:** several connections per file (aria2c) and parallel pieces; 1–4 downloads at the same time
 - **Downloads tab:** two at a time, progress and time left, a notification when done; tap to open, share, or **Edit** to convert, clear or delete several at once
 - **Ask or go:** pick the quality each time, or have shared links download straight away with your saved settings
 - **Updates built in:** checks this GitHub page when it starts and offers *Update*, which downloads the new version for you to install
@@ -120,7 +122,7 @@ Everything that changed is in the [changelog](CHANGELOG.md).
 
 ## Install
 
-1. **[Download the APK](https://github.com/ilukezippo/Grabbit/releases/download/v1.0.0/Grabbit-1.0.0-arm64.apk)** on your phone, or pick a file on the [Releases](../../releases/latest) page.
+1. **[Download the APK](https://github.com/ilukezippo/Grabbit/releases/latest)** on your phone, or pick a file on the [Releases](../../releases/latest) page.
 2. Open it. Android asks to allow **Install unknown apps** for your browser or file manager once: allow it, go back and tap **Install**.
 3. Open Grabbit. The first start takes a few seconds while the download engine sets itself up.
 
@@ -154,7 +156,7 @@ ui/           Jetpack Compose screens, Arabic and English
 
 ## How it works
 
-- [youtubedl-android](https://github.com/JunkFood02/youtubedl-android) bundles Python, yt-dlp and FFmpeg inside the app, so downloading, merging and converting all happen on the phone.
+- [youtubedl-android](https://github.com/JunkFood02/youtubedl-android) bundles Python, yt-dlp, FFmpeg and aria2c inside the app, so downloading, merging and converting all happen on the phone.
 - A link is tried in order: Instagram (when you're signed in), yt-dlp, X photo posts, direct files, then the page's preview picture.
 - Downloads run in a foreground service so Android doesn't stop them when you switch apps; finished files are copied to `Download/Grabbit` through MediaStore.
 - Live recordings are saved as MPEG-TS while recording, so stopping never breaks the file, then turned into MP4.
