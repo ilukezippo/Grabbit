@@ -1,0 +1,102 @@
+<resources>
+    <string name="app_name">Grabbit</string>
+    <string name="share_label">Grab with Grabbit</string>
+    <string name="tagline">Grab videos, music &amp; photos from anywhere</string>
+    <string name="ch_downloads">Downloads</string>
+    <string name="ch_recorder">Screen recorder</string>
+    <string name="preparing">Preparing…</string>
+    <plurals name="n_downloading">
+        <item quantity="one">%d download in progress</item>
+        <item quantity="other">%d downloads in progress</item>
+    </plurals>
+
+    <string name="tab_home">Grab</string>
+    <string name="tab_downloads">Downloads</string>
+    <string name="tab_tools">Tools</string>
+    <string name="tab_settings">Settings</string>
+
+    <string name="paste_hint">Paste a link from any app</string>
+    <string name="paste">Paste</string>
+    <string name="clear">Clear</string>
+    <string name="grab">Grab</string>
+    <string name="fetching">Looking it up…</string>
+    <string name="clipboard_found">Link in clipboard — tap to use</string>
+    <string name="engine_loading">Starting engine…</string>
+    <string name="engine_failed">Engine failed to start: %s</string>
+    <string name="works_with">Works with YouTube, Instagram, TikTok, X, Facebook, Snapchat, Reddit, Twitch, Vimeo, Pinterest, SoundCloud and 1,000+ more.</string>
+
+    <string name="video">Video</string>
+    <string name="audio">Audio</string>
+    <string name="quality">Quality</string>
+    <string name="format">Format</string>
+    <string name="best">Best</string>
+    <string name="download">Download</string>
+    <string name="download_n">Download all (%d)</string>
+    <string name="items_n">%d items</string>
+    <string name="live_now">LIVE</string>
+    <string name="record_stream">Record stream</string>
+    <string name="live_hint">Recording keeps going until you tap Stop &amp; save in Downloads or the stream ends.</string>
+    <string name="added_queue">Added to downloads</string>
+    <string name="photos">Photos</string>
+    <string name="videos_photos">Photos &amp; videos</string>
+
+    <string name="downloads_empty">Nothing here yet.\nGrab something!</string>
+    <string name="clear_finished">Clear finished</string>
+    <string name="queued">Queued</string>
+    <string name="done">Done</string>
+    <string name="failed">Failed</string>
+    <string name="canceled">Canceled</string>
+    <string name="cancel">Cancel</string>
+    <string name="stop_save">Stop &amp; save</string>
+    <string name="retry">Retry</string>
+    <string name="open">Open</string>
+    <string name="share">Share</string>
+    <string name="remove">Remove</string>
+    <string name="eta">%s left</string>
+    <string name="no_app_open">No app can open this file</string>
+
+    <string name="rec_title">Screen recording</string>
+    <string name="rec_desc">Record live streams or anything on screen. A floating bubble lets you stop from any app.</string>
+    <string name="rec_audio">Record app sound (Android 10+)</string>
+    <string name="rec_start">Start recording</string>
+    <string name="rec_stop">Stop recording</string>
+    <string name="rec_running">Grabbit is recording</string>
+    <string name="rec_tap_stop">Tap Stop or the floating bubble to finish</string>
+    <string name="rec_saved">Recording saved to Download/Grabbit</string>
+    <string name="rec_failed">Couldn\'t record: %s</string>
+    <string name="rec_overlay">Allow the floating stop bubble</string>
+    <string name="stop">Stop</string>
+
+    <string name="conv_title">Convert a file</string>
+    <string name="conv_desc">Turn any video or audio on your phone into another format.</string>
+    <string name="conv_pick">Choose file</string>
+    <string name="conv_to">Convert to</string>
+    <string name="conv_start">Convert</string>
+    <string name="conv_running">Converting… %d%%</string>
+    <string name="conv_done">Saved to Download/Grabbit</string>
+    <string name="conv_failed">Conversion failed: %s</string>
+
+    <string name="set_language">Language</string>
+    <string name="set_defaults">Default download</string>
+    <string name="set_instagram">Instagram account</string>
+    <string name="ig_desc">Sign in to download stories, photos and private posts you can see. Your login stays on this phone only.</string>
+    <string name="ig_connect">Sign in to Instagram</string>
+    <string name="ig_connected">Signed in</string>
+    <string name="ig_logout">Sign out</string>
+    <string name="ig_login_title">Instagram sign in</string>
+    <string name="ig_login_ok">Instagram connected</string>
+    <string name="set_engine">Download engine</string>
+    <string name="engine_version">yt-dlp %s</string>
+    <string name="engine_update">Update engine</string>
+    <string name="engine_updating">Updating…</string>
+    <string name="engine_updated">Engine is up to date (%s)</string>
+    <string name="engine_update_hint">If a site stops working, update the engine — sites change often.</string>
+    <string name="about">About</string>
+    <string name="about_text">Grabbit %s · free, no ads, no tracking.\nFiles are saved to Download/Grabbit.</string>
+    <string name="more_apps">More apps by ilukezippo</string>
+
+    <string name="err_ig_login">Instagram needs you to sign in for this post. Go to Settings → Instagram account.</string>
+    <string name="err_ig_login_stories">Stories need an Instagram sign-in. Go to Settings → Instagram account.</string>
+    <string name="err_unsupported">This link isn\'t supported.</string>
+    <string name="err_no_link">No link found in that text.</string>
+</resources>

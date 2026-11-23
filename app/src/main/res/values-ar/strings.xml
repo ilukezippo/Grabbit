@@ -1,0 +1,106 @@
+<resources>
+    <string name="app_name">Grabbit</string>
+    <string name="share_label">التنزيل بـ Grabbit</string>
+    <string name="tagline">نزّل الفيديوهات والصوتيات والصور من أي مكان</string>
+    <string name="ch_downloads">التنزيلات</string>
+    <string name="ch_recorder">تسجيل الشاشة</string>
+    <string name="preparing">جارٍ التحضير…</string>
+    <plurals name="n_downloading">
+        <item quantity="zero">لا توجد تنزيلات</item>
+        <item quantity="one">تنزيل واحد قيد التنفيذ</item>
+        <item quantity="two">تنزيلان قيد التنفيذ</item>
+        <item quantity="few">%d تنزيلات قيد التنفيذ</item>
+        <item quantity="many">%d تنزيلًا قيد التنفيذ</item>
+        <item quantity="other">%d تنزيل قيد التنفيذ</item>
+    </plurals>
+
+    <string name="tab_home">تنزيل</string>
+    <string name="tab_downloads">التنزيلات</string>
+    <string name="tab_tools">أدوات</string>
+    <string name="tab_settings">الإعدادات</string>
+
+    <string name="paste_hint">الصق رابطًا من أي تطبيق</string>
+    <string name="paste">لصق</string>
+    <string name="clear">مسح</string>
+    <string name="grab">جلب</string>
+    <string name="fetching">جارٍ البحث…</string>
+    <string name="clipboard_found">يوجد رابط في الحافظة — اضغط لاستخدامه</string>
+    <string name="engine_loading">جارٍ تشغيل المحرك…</string>
+    <string name="engine_failed">تعذّر تشغيل المحرك: %s</string>
+    <string name="works_with">يعمل مع يوتيوب وإنستغرام وتيك توك وإكس وفيسبوك وسناب شات وريديت وتويتش وفيميو وبنترست وساوند كلاود وأكثر من ١٠٠٠ موقع.</string>
+
+    <string name="video">فيديو</string>
+    <string name="audio">صوت</string>
+    <string name="quality">الجودة</string>
+    <string name="format">الصيغة</string>
+    <string name="best">الأفضل</string>
+    <string name="download">تنزيل</string>
+    <string name="download_n">تنزيل الكل (%d)</string>
+    <string name="items_n">%d عناصر</string>
+    <string name="live_now">مباشر</string>
+    <string name="record_stream">تسجيل البث</string>
+    <string name="live_hint">يستمر التسجيل حتى تضغط «إيقاف وحفظ» في التنزيلات أو ينتهي البث.</string>
+    <string name="added_queue">أُضيف إلى التنزيلات</string>
+    <string name="photos">صور</string>
+    <string name="videos_photos">صور وفيديوهات</string>
+
+    <string name="downloads_empty">لا يوجد شيء بعد.\nابدأ التنزيل!</string>
+    <string name="clear_finished">مسح المكتملة</string>
+    <string name="queued">في الانتظار</string>
+    <string name="done">اكتمل</string>
+    <string name="failed">فشل</string>
+    <string name="canceled">أُلغي</string>
+    <string name="cancel">إلغاء</string>
+    <string name="stop_save">إيقاف وحفظ</string>
+    <string name="retry">إعادة</string>
+    <string name="open">فتح</string>
+    <string name="share">مشاركة</string>
+    <string name="remove">حذف</string>
+    <string name="eta">متبقٍ %s</string>
+    <string name="no_app_open">لا يوجد تطبيق لفتح هذا الملف</string>
+
+    <string name="rec_title">تسجيل الشاشة</string>
+    <string name="rec_desc">سجّل البثوث المباشرة أو أي شيء على الشاشة. فقاعة عائمة تتيح لك الإيقاف من أي تطبيق.</string>
+    <string name="rec_audio">تسجيل صوت التطبيقات (أندرويد ١٠+)</string>
+    <string name="rec_start">بدء التسجيل</string>
+    <string name="rec_stop">إيقاف التسجيل</string>
+    <string name="rec_running">Grabbit يسجّل الآن</string>
+    <string name="rec_tap_stop">اضغط إيقاف أو الفقاعة العائمة للإنهاء</string>
+    <string name="rec_saved">حُفظ التسجيل في Download/Grabbit</string>
+    <string name="rec_failed">تعذّر التسجيل: %s</string>
+    <string name="rec_overlay">السماح بفقاعة الإيقاف العائمة</string>
+    <string name="stop">إيقاف</string>
+
+    <string name="conv_title">تحويل ملف</string>
+    <string name="conv_desc">حوّل أي فيديو أو صوت على جوالك إلى صيغة أخرى.</string>
+    <string name="conv_pick">اختر ملفًا</string>
+    <string name="conv_to">تحويل إلى</string>
+    <string name="conv_start">تحويل</string>
+    <string name="conv_running">جارٍ التحويل… %d%%</string>
+    <string name="conv_done">حُفظ في Download/Grabbit</string>
+    <string name="conv_failed">فشل التحويل: %s</string>
+
+    <string name="set_language">اللغة</string>
+    <string name="set_defaults">التنزيل الافتراضي</string>
+    <string name="set_instagram">حساب إنستغرام</string>
+    <string name="ig_desc">سجّل الدخول لتنزيل القصص والصور والمنشورات الخاصة التي يمكنك رؤيتها. بيانات الدخول تبقى على هذا الجوال فقط.</string>
+    <string name="ig_connect">تسجيل الدخول إلى إنستغرام</string>
+    <string name="ig_connected">تم تسجيل الدخول</string>
+    <string name="ig_logout">تسجيل الخروج</string>
+    <string name="ig_login_title">تسجيل الدخول إلى إنستغرام</string>
+    <string name="ig_login_ok">تم ربط إنستغرام</string>
+    <string name="set_engine">محرك التنزيل</string>
+    <string name="engine_version">yt-dlp %s</string>
+    <string name="engine_update">تحديث المحرك</string>
+    <string name="engine_updating">جارٍ التحديث…</string>
+    <string name="engine_updated">المحرك محدّث (%s)</string>
+    <string name="engine_update_hint">إذا توقف موقع عن العمل، حدّث المحرك — المواقع تتغير باستمرار.</string>
+    <string name="about">حول</string>
+    <string name="about_text">Grabbit %s · مجاني، بلا إعلانات ولا تتبّع.\nتُحفظ الملفات في Download/Grabbit.</string>
+    <string name="more_apps">تطبيقات أخرى من ilukezippo</string>
+
+    <string name="err_ig_login">يتطلب هذا المنشور تسجيل الدخول إلى إنستغرام. اذهب إلى الإعدادات ← حساب إنستغرام.</string>
+    <string name="err_ig_login_stories">القصص تتطلب تسجيل الدخول إلى إنستغرام. اذهب إلى الإعدادات ← حساب إنستغرام.</string>
+    <string name="err_unsupported">هذا الرابط غير مدعوم.</string>
+    <string name="err_no_link">لم يُعثر على رابط في النص.</string>
+</resources>
