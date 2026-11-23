@@ -51,6 +51,9 @@ class GrabViewModel(app: Application) : AndroidViewModel(app) {
         reset()
     }
 
+    /** Screenshots/tests only. */
+    fun showForPreview(url: String, info: MediaInfo) { input.value = url; _state.value = GrabState.Loaded(info) }
+
     fun reset() {
         job?.cancel()
         _state.value = GrabState.Idle

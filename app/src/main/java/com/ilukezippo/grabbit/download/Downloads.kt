@@ -71,6 +71,9 @@ object Downloads {
         enqueue(ctx, t.spec)
     }
 
+    /** Screenshots/tests only. */
+    fun setForPreview(list: List<DownloadTask>) { _tasks.value = list }
+
     fun addExternal(ctx: Context, title: String, file: SavedFile) {
         val t = DownloadTask(UUID.randomUUID().toString().take(8), DownloadSpec(file.uri, title, null, null),
             status = Status.DONE, progress = 100f, files = listOf(file))

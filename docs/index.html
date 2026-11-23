@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grabbit: Free Video, Music &amp; Photo Downloader for Android (No Ads)</title>
+<meta name="description" content="Free, open-source video downloader for Android with no ads. Download from YouTube, Instagram, TikTok, X, Facebook and 1,000+ sites, choose 144p to 4K or MP3, save Instagram stories and photos, record live streams and convert files. A Snaptube alternative.">
+<meta name="keywords" content="video downloader for android, snaptube alternative, free video downloader no ads, youtube downloader android, instagram story downloader, tiktok downloader, mp3 downloader android, 4k video downloader android, live stream recorder android, screen recorder internal audio, yt-dlp android, open source">
+<link rel="canonical" href="https://ilukezippo.github.io/Grabbit/">
+<link rel="icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="img/icon.png">
+<meta name="theme-color" content="#0e0d14">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Grabbit: paste a link, pick the quality, grab it">
+<meta property="og:description" content="Free, ad-free video, music and photo downloader for Android. YouTube, Instagram, TikTok, X and 1,000+ sites.">
+<meta property="og:url" content="https://ilukezippo.github.io/Grabbit/">
+<meta property="og:image" content="https://ilukezippo.github.io/Grabbit/img/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Grabbit",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Android 7.0 or newer",
+  "softwareVersion": "1.0.0",
+  "description": "Free, ad-free video, music and photo downloader for Android. Download from YouTube, Instagram, TikTok, X, Facebook and 1,000+ sites in 144p to 4K, MP4, MKV, WEBM, MP3, M4A or OPUS. Saves Instagram stories and carousels, records live streams, records the screen with app sound and converts files.",
+  "url": "https://ilukezippo.github.io/Grabbit/",
+  "downloadUrl": "https://github.com/ilukezippo/Grabbit/releases/download/v1.0.0/Grabbit-1.0.0-arm64.apk",
+  "screenshot": "https://ilukezippo.github.io/Grabbit/img/og.jpg",
+  "license": "https://opensource.org/licenses/MIT",
+  "author": {"@type": "Person", "name": "ilukezippo (BoYaqoub)", "url": "https://github.com/ilukezippo"},
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "Is Grabbit free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Grabbit is free and open source under the MIT License, with no ads and no in-app purchases."}},
+    {"@type": "Question", "name": "Is Grabbit a Snaptube alternative?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. It downloads videos, music and photos from YouTube, Instagram, TikTok, X, Facebook and 1,000+ sites like Snaptube, without ads, accounts or tracking."}},
+    {"@type": "Question", "name": "Can Grabbit download Instagram stories?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Sign in to Instagram once inside Grabbit, then share or paste a story link. The login stays on your phone and is only sent to Instagram."}},
+    {"@type": "Question", "name": "Why isn't Grabbit on Google Play?", "acceptedAnswer": {"@type": "Answer", "text": "Google Play doesn't allow apps that download from YouTube. Grabbit is installed from its GitHub releases page instead, and is built from public source code."}}
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --desk: #0e0d14;        /* hero background, the app's own canvas */
+  --page: #131219;
+  --ink: #f4f2fa;
+  --muted: #a39eb5;
+  --surface: #17151f;     /* app cards */
+  --surface-2: #211e2c;
+  --stroke: #2e2a3b;
+  --violet: #8b5cf6;
+  --pink: #ec4899;
+  --amber: #f59e0b;
+  --green: #34d399;
+  --red: #f43f5e;
+  --grad: linear-gradient(100deg, var(--violet), var(--pink) 55%, var(--amber));
+  --line: #2a2733;
+  --card: #1b1923;
+  --link: #f0a3d0;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --desk: #ece9f5; --page: #f7f6fb; --ink: #17151f; --muted: #5d5870;
+    --line: #dcd8e6; --card: #ffffff; --link: #b0257a;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--page); color: var(--ink);
+  font: 400 17px/1.55 "Schibsted Grotesk", "Segoe UI", system-ui, sans-serif;
+}
+a { color: var(--link); }
+a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; border-radius: 6px; }
+img { max-width: 100%; height: auto; display: block; }
+.wrap { width: min(1120px, 100% - 32px); margin-inline: auto; }
+.grad-text { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* ---------- top bar */
+.bar { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 19px; color: var(--ink); text-decoration: none; }
+.brand img { width: 30px; height: 30px; border-radius: 8px; }
+.bar nav { display: flex; gap: 22px; font-size: 15px; }
+.bar nav a { color: var(--muted); text-decoration: none; }
+.bar nav a:hover { color: var(--ink); }
+
+/* ---------- hero */
+.hero { background:
+  radial-gradient(800px 500px at 85% 20%, rgba(139,92,246,.28), transparent 60%),
+  radial-gradient(700px 500px at 70% 90%, rgba(236,72,153,.18), transparent 60%),
+  var(--desk); }
+.hero .split { display: grid; grid-template-columns: 1fr minmax(300px, 400px); gap: 48px; align-items: center; padding: 48px 0 72px; }
+.hero h1 { font-size: clamp(40px, 6vw, 72px); line-height: 1.02; letter-spacing: -0.03em; font-weight: 800; margin: 0 0 22px; max-width: 12ch; }
+.hero h1 span { display: block; }
+.hero p.lede { font-size: 19px; color: var(--muted); max-width: 46ch; margin: 0 0 30px; }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.btn {
+  display: inline-flex; align-items: center; gap: 10px; padding: 14px 22px; border-radius: 999px;
+  font: 700 16px/1 inherit; font-family: inherit; text-decoration: none; border: 0; cursor: pointer;
+}
+.btn-main { background: var(--grad); color: #fff; box-shadow: 0 8px 24px rgba(236,72,153,.32); }
+.btn-main:hover { filter: brightness(1.06); }
+.btn-quiet { background: var(--surface-2); color: #f4f2fa; border: 1px solid var(--stroke); }
+.btn-big { padding: 12px 26px 12px 14px; border-radius: 18px; gap: 14px; text-align: left;
+  box-shadow: 0 3px 0 rgba(91,31,110,.55), 0 12px 30px rgba(236,72,153,.32); }
+.btn-big .dl-icon { width: 42px; height: 42px; flex: none; }
+.btn-big .dl-text { display: grid; gap: 4px; }
+.btn-big .dl-main { font-size: 21px; font-weight: 800; line-height: 1.1; }
+.btn-big .dl-sub { font-size: 13px; font-weight: 600; opacity: .9; line-height: 1.1; }
+.btn-big:active { transform: translateY(2px); }
+.fine { font-size: 14px; color: var(--muted); margin-top: 14px; }
+
+/* ---------- the live phone demo */
+.stage { display: grid; justify-items: center; gap: 18px; }
+.phone {
+  width: 100%; max-width: 360px; border-radius: 46px; padding: 12px; background: #16151c;
+  border: 2px solid #3a3646; box-shadow: 0 40px 80px rgba(0,0,0,.45), inset 0 0 0 2px #0b0a10;
+}
+.screen { border-radius: 36px; overflow: hidden; background: #0e0d14; color: #f4f2fa; padding: 22px 16px 16px; position: relative; font-size: 14px; }
+.screen .notch { width: 12px; height: 12px; border-radius: 50%; background: #000; margin: -10px auto 12px; }
+.app-title { font-size: 26px; font-weight: 800; letter-spacing: -.02em; margin: 0; }
+.app-sub { color: #9c97ae; font-size: 12px; margin: 0 0 12px; }
+.linkbox { background: #17151f; border-radius: 18px; padding: 10px; display: grid; gap: 8px; }
+.url { background: #211e2c; border: 1px solid #2e2a3b; border-radius: 12px; padding: 10px 12px; font-size: 13px; color: #f4f2fa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.grab { background: var(--grad); border-radius: 12px; padding: 10px; text-align: center; font-weight: 700; color: #fff; }
+.card { margin-top: 12px; background: #17151f; border-radius: 18px; overflow: hidden; }
+.thumb { aspect-ratio: 16 / 9; position: relative; background-size: cover; background-position: center; transition: background-image .2s; }
+.thumb .tag { position: absolute; top: 8px; left: 8px; display: flex; gap: 6px; }
+.thumb .tag span, .thumb .dur { background: rgba(0,0,0,.6); color: #fff; border-radius: 999px; padding: 3px 9px; font-size: 10px; font-weight: 700; }
+.thumb .tag .live { background: var(--red); }
+.thumb .tag .count { background: var(--violet); }
+.thumb .dur { position: absolute; right: 8px; bottom: 8px; }
+.meta { padding: 10px 12px; }
+.meta b { display: block; font-size: 13px; line-height: 1.3; }
+.meta small { color: #9c97ae; font-size: 11px; }
+.seg { display: flex; background: #211e2c; border-radius: 14px; padding: 3px; margin-top: 12px; }
+.seg button { flex: 1; border: 0; background: none; color: #9c97ae; font: 600 13px inherit; font-family: inherit; padding: 8px; border-radius: 11px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--grad); color: #fff; }
+.lbl { color: #9c97ae; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 12px 0 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid #2e2a3b; background: #211e2c; color: #f4f2fa; border-radius: 11px; padding: 7px 11px; font: 600 12px inherit; font-family: inherit; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--grad); border-color: transparent; color: #fff; }
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 12px; }
+.tiles div { aspect-ratio: 1; border-radius: 10px; background-size: cover; }
+.go { margin-top: 12px; width: 100%; border: 0; border-radius: 14px; padding: 12px; background: var(--grad); color: #fff; font: 700 14px inherit; font-family: inherit; cursor: pointer; position: relative; overflow: hidden; }
+.go .fill { position: absolute; inset: 0; width: 0; background: rgba(255,255,255,.25); transition: width .1s linear; }
+.go span { position: relative; }
+.go.done { background: #1f3b31; color: var(--green); }
+.pills { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.pill {
+  font: 600 14px/1 inherit; font-family: inherit; padding: 10px 16px; border-radius: 999px; border: 1px solid var(--stroke);
+  background: var(--surface-2); color: #f4f2fa; cursor: pointer;
+}
+.pill[aria-pressed="true"] { background: var(--grad); color: #fff; border-color: transparent; }
+.stage-note { font-size: 14px; color: var(--muted); text-align: center; margin: 0; min-height: 1.5em; }
+
+/* ---------- sections */
+section { padding: 72px 0; }
+section + section { border-top: 1px solid var(--line); }
+h2 { font-size: clamp(28px, 3.4vw, 40px); letter-spacing: -0.02em; line-height: 1.1; margin: 0 0 14px; font-weight: 800; }
+.intro { color: var(--muted); max-width: 62ch; margin: 0 0 36px; }
+
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; counter-reset: s; }
+.steps li { counter-increment: s; }
+.steps li::before {
+  content: counter(s); display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  background: var(--grad); color: #fff; font-weight: 800; font-size: 20px; margin-bottom: 14px;
+}
+.steps h3 { margin: 0 0 6px; font-size: 21px; }
+.steps p { margin: 0; color: var(--muted); }
+.keys { margin-top: 28px; color: var(--muted); }
+.keys kbd {
+  display: inline-block; padding: 2px 9px; border-radius: 6px; border: 1px solid var(--line); border-bottom-width: 2px;
+  background: var(--card); color: var(--ink); font: 600 14px/1.5 inherit; font-family: inherit;
+}
+
+.shot { margin: 0; }
+.shot img { border-radius: 18px; }
+.shot figcaption { font-size: 14px; color: var(--muted); margin-top: 10px; text-align: center; }
+.wide { margin-bottom: 40px; }
+.wide img { box-shadow: 0 30px 70px rgba(0,0,0,0.3); }
+.phones { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; align-items: start; }
+
+.formats { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 8px 40px; margin: 0; }
+.formats div { padding: 16px 0; border-bottom: 1px solid var(--line); }
+.formats dt { font-weight: 700; margin-bottom: 4px; }
+.formats dd { margin: 0; color: var(--muted); font-size: 15px; }
+.formats dd b { color: var(--ink); font-weight: 600; }
+.popular { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.popular li { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; font-size: 15px; font-weight: 500; }
+.note { font-size: 15px; color: var(--muted); margin-top: 26px; max-width: 70ch; }
+
+.faq { max-width: 760px; }
+.faq details { border-bottom: 1px solid var(--line); padding: 18px 0; }
+.faq summary { font-weight: 700; font-size: 18px; cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; color: var(--pink); font-weight: 800; }
+.faq details[open] summary::after { content: "–"; }
+.faq details p { margin: 10px 0 0; color: var(--muted); max-width: 66ch; }
+
+footer { padding: 40px 0 56px; border-top: 1px solid var(--line); font-size: 15px; color: var(--muted); }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 14px 28px; justify-content: space-between; }
+footer nav { display: flex; flex-wrap: wrap; gap: 20px; }
+
+@media (max-width: 860px) {
+  .hero .split { grid-template-columns: 1fr; padding: 28px 0 48px; }
+  .steps { grid-template-columns: 1fr; }
+  .phones { grid-template-columns: repeat(2, 1fr); }
+  .bar nav a.hide-sm { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="wrap bar">
+    <a class="brand" href="./"><img src="img/icon.png" alt="" width="30" height="30">Grabbit</a>
+    <nav aria-label="Page">
+      <a class="hide-sm" href="#how">How it works</a>
+      <a class="hide-sm" href="#look">Screens</a>
+      <a class="hide-sm" href="#features">Features</a>
+      <a class="hide-sm" href="#sites">Sites</a>
+      <a class="hide-sm" href="#install">Install</a>
+      <a href="https://github.com/ilukezippo/Grabbit">GitHub</a>
+    </nav>
+  </div>
+  <div class="wrap split">
+    <div>
+      <h1><span>Paste a link.</span><span>Pick the quality.</span><span class="grad-text">Grab it.</span></h1>
+      <p class="lede">Grabbit is a free video, music and photo downloader for Android with no ads. Save YouTube, Instagram, TikTok, X and Facebook videos in 144p to 4K, turn them into MP3, keep Instagram stories and carousels, and record live streams, all from the Share button.</p>
+      <div class="cta">
+        <a class="btn btn-main btn-big" data-dl href="https://github.com/ilukezippo/Grabbit/releases/download/v1.0.0/Grabbit-1.0.0-arm64.apk">
+          <svg class="dl-icon" viewBox="-24 -24 48 48" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><circle r="20" stroke-opacity=".35"/><path d="M0 -10 V8 M-8 1 L0 9 L8 1"/></svg>
+          <span class="dl-text"><span class="dl-main">Download for Android</span><span class="dl-sub">Free · No ads · Android 7.0 and newer</span></span>
+        </a>
+        <a class="btn btn-quiet" href="https://github.com/ilukezippo/Grabbit">View source</a>
+      </div>
+      <p class="fine">Version <span data-ver>1.0.0</span> APK for Android 7.0+ (64-bit). Free and open source, MIT License. <a href="#install">How to install</a></p>
+    </div>
+
+    <div class="stage">
+      <div class="phone" aria-label="Interactive preview of Grabbit">
+        <div class="screen">
+          <div class="notch"></div>
+          <p class="app-title grad-text">Grabbit</p>
+          <p class="app-sub">Grab videos, music &amp; photos from anywhere</p>
+          <div class="linkbox">
+            <div class="url" id="url">https://youtu.be/k8Xx2</div>
+            <div class="grab">⚡ Grab</div>
+          </div>
+          <div class="card">
+            <div class="thumb" id="thumb">
+              <div class="tag" id="tags"></div>
+              <span class="dur" id="dur">12:34</span>
+            </div>
+            <div class="meta"><b id="title">Kuwait City skyline at night — 4K drone tour</b><small id="who">Gulf Drones</small></div>
+          </div>
+          <div id="opts"></div>
+          <button class="go" id="go"><i class="fill" id="fill"></i><span id="goT">⬇ Download</span></button>
+        </div>
+      </div>
+      <div class="pills" role="group" aria-label="Example">
+        <button class="pill" data-mode="video" aria-pressed="true">Video</button>
+        <button class="pill" data-mode="music" aria-pressed="false">Music</button>
+        <button class="pill" data-mode="insta" aria-pressed="false">Instagram</button>
+        <button class="pill" data-mode="live" aria-pressed="false">Live</button>
+      </div>
+      <p class="stage-note" id="note" aria-live="polite">Tap a quality, then Download.</p>
+    </div>
+  </div>
+</div>
+
+<main>
+  <section id="how">
+    <div class="wrap">
+      <h2>How it works</h2>
+      <p class="intro">You keep watching in the apps you already use. When you see something worth keeping, send it to Grabbit.</p>
+      <ol class="steps">
+        <li><h3>Share or paste a link</h3><p>Tap <b>Share → Grabbit</b> in YouTube, Instagram, TikTok or any app, or copy the link and open Grabbit.</p></li>
+        <li><h3>Pick the quality</h3><p>Best, 4K, 1080p, 720p… in MP4, MKV or WEBM, or just the audio as MP3, M4A or OPUS. Grabbit remembers what you like.</p></li>
+        <li><h3>It's in your Downloads</h3><p>Files go to <b>Download/Grabbit</b>, ready in your gallery and music player. Open or share them straight from the app.</p></li>
+      </ol>
+      <p class="keys">Copied a link already? Open Grabbit and it's waiting at the top: one tap to look it up.</p>
+    </div>
+  </section>
+
+  <section id="look">
+    <div class="wrap">
+      <h2>Simple on the outside</h2>
+      <p class="intro">A clean, dark design with big buttons. Everything a downloader needs, nothing you didn't ask for.</p>
+      <figure class="shot wide">
+        <img src="img/combo.webp" width="1600" height="980" loading="lazy" alt="Grabbit showing an Instagram carousel, a YouTube video with quality choices, and the downloads list">
+      </figure>
+      <div class="phones">
+        <figure class="shot"><img src="img/downloads.webp" width="540" height="1153" loading="lazy" alt="Downloads list with progress and a live recording"><figcaption>Downloads, live recording included</figcaption></figure>
+        <figure class="shot"><img src="img/tools.webp" width="540" height="1153" loading="lazy" alt="Screen recorder and file converter"><figcaption>Screen recorder and converter</figcaption></figure>
+        <figure class="shot"><img src="img/settings.webp" width="540" height="1153" loading="lazy" alt="Settings: language, defaults, Instagram, engine"><figcaption>Your defaults, Instagram, updates</figcaption></figure>
+        <figure class="shot"><img src="img/arabic.webp" width="540" height="1153" loading="lazy" alt="Grabbit in Arabic, right to left"><figcaption>Arabic, right to left</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="wrap">
+      <h2>Everything in 1.0</h2>
+      <p class="intro">Downloads, photos, stories, live streams, a screen recorder and a converter, in one small app. <a href="https://github.com/ilukezippo/Grabbit/blob/main/CHANGELOG.md">Changelog</a>.</p>
+      <dl class="formats">
+        <div><dt>1,000+ sites</dt><dd>YouTube, Instagram, TikTok, X, Facebook, Snapchat Spotlight, Reddit, Twitch, Vimeo, Pinterest, SoundCloud and many more, powered by <b>yt-dlp</b>.</dd></div>
+        <div><dt>Your quality, your format</dt><dd><b>144p to 4K</b> in MP4, MKV or WEBM, or <b>audio only</b> as MP3, M4A or OPUS at the best quality the site has.</dd></div>
+        <div><dt>Instagram stories &amp; photos</dt><dd>Reels, posts, <b>carousels</b> with every photo and video, <b>stories</b> and private posts you can see. Sign in once; the login never leaves your phone.</dd></div>
+        <div><dt>Share → Grabbit</dt><dd>A quick sheet slides up over the app you're in, with the preview and quality choices. Download and keep watching.</dd></div>
+        <div><dt>Record live streams</dt><dd>YouTube Live, Twitch, TikTok Live, Kick and more at full quality. Tap <b>Stop &amp; save</b> whenever you want; the file is never broken.</dd></div>
+        <div><dt>Screen recorder</dt><dd>Records the screen with the <b>sound apps play</b> (Android 10+). A floating bubble shows the time and stops with a tap, from any app.</dd></div>
+        <div><dt>Converter</dt><dd>Turn any video or audio on your phone into <b>MP3, M4A, OPUS, MP4, MKV, WEBM or GIF</b>, right on the phone.</dd></div>
+        <div><dt>Downloads tab</dt><dd>Two at a time with progress and time left. Cancel, retry, open and share, and your history is still there after a restart.</dd></div>
+        <div><dt>Arabic and English</dt><dd>Switch in Settings. Arabic gets a full right-to-left layout.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section id="popular">
+    <div class="wrap">
+      <h2>Popular downloads</h2>
+      <p class="intro">What people grab most, each one a share and a tap.</p>
+      <ul class="popular">
+        <li>YouTube to MP4</li><li>YouTube to MP3</li><li>4K YouTube videos</li><li>Instagram Reels</li>
+        <li>Instagram stories</li><li>Instagram carousel photos</li><li>TikTok videos</li><li>X (Twitter) videos and photos</li>
+        <li>Facebook videos</li><li>Snapchat Spotlight</li><li>Reddit videos with sound</li><li>SoundCloud to MP3</li>
+        <li>Record a Twitch stream</li><li>Record YouTube Live</li><li>Screen record with sound</li><li>Video to GIF</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="sites">
+    <div class="wrap">
+      <h2>What it downloads</h2>
+      <p class="intro">Everything runs on your phone with built-in yt-dlp and FFmpeg. No account, no server, no tracking.</p>
+      <dl class="formats">
+        <div><dt>Video</dt><dd>YouTube, TikTok, Facebook, X, Reddit, Vimeo, Dailymotion, Snapchat Spotlight, Pinterest, Bilibili and <a href="https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md">1,000+ more</a>. <b>To</b> MP4, MKV, WEBM.</dd></div>
+        <div><dt>Music</dt><dd>SoundCloud, Bandcamp, Mixcloud, YouTube Music, or the sound of any video. <b>To</b> MP3, M4A, OPUS.</dd></div>
+        <div><dt>Live</dt><dd>YouTube Live, Twitch, TikTok Live, Kick. <b>Saved as</b> MP4 at the quality you pick.</dd></div>
+        <div><dt>Instagram</dt><dd>Reels, posts, carousels, stories and private posts you follow, at full size.</dd></div>
+        <div><dt>Photos</dt><dd>X photo posts, direct image links, and the preview picture of any web page.</dd></div>
+        <div><dt>Your own files</dt><dd>Convert any video or audio on the phone to MP3, M4A, OPUS, MP4, MKV, WEBM or GIF.</dd></div>
+      </dl>
+      <p class="note">Services with DRM (Netflix, Shahid, Disney+, Spotify songs) can't be downloaded. If a site stops working, tap <b>Settings → Update engine</b>: sites change often and yt-dlp keeps up.</p>
+    </div>
+  </section>
+
+  <section id="install">
+    <div class="wrap">
+      <h2>Install</h2>
+      <p class="intro">Google Play doesn't allow YouTube downloaders, so Grabbit is installed straight from its GitHub releases. It takes a minute.</p>
+      <ol class="steps">
+        <li><h3>Download the APK</h3><p>Tap <a data-dl href="https://github.com/ilukezippo/Grabbit/releases/download/v1.0.0/Grabbit-1.0.0-arm64.apk">Download for Android</a> on your phone.</p></li>
+        <li><h3>Allow the install</h3><p>Open the file. Android asks to allow <b>Install unknown apps</b> once: allow it, go back and tap <b>Install</b>.</p></li>
+        <li><h3>Open Grabbit</h3><p>The first start takes a few seconds while the engine sets itself up. Then share your first link.</p></li>
+      </ol>
+      <p class="keys">If Play Protect says it hasn't seen the app before, tap <b>More details → Install anyway</b>. Grabbit is built from the <a href="https://github.com/ilukezippo/Grabbit">public source code</a>.</p>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap faq">
+      <h2>Questions</h2>
+      <details><summary>Is Grabbit free?</summary><p>Yes. It's free and open source under the MIT License, with no ads and nothing to buy. If it saves you time, you can <a href="https://buymeacoffee.com/ilukezippo">buy the author a coffee</a>.</p></details>
+      <details><summary>Is this a Snaptube alternative?</summary><p>That's the idea: the same "share a link, pick a quality, download" flow, without ads, pop-ups, accounts or trackers, and with Instagram stories, live recording and a screen recorder on top.</p></details>
+      <details><summary>Does Grabbit collect my data?</summary><p>No. There's no account, no analytics and no Grabbit server. It only connects to the sites of the links you grab, and to GitHub when you tap <i>Update engine</i>. See the <a href="https://github.com/ilukezippo/Grabbit/blob/main/PRIVACY.md">privacy policy</a>.</p></details>
+      <details><summary>How do I download Instagram stories?</summary><p>Go to <b>Settings → Instagram account</b> and sign in once. Then share or paste a story link. Your login stays on your phone and is only sent to Instagram.</p></details>
+      <details><summary>Can it record the sound of a live stream or game?</summary><p>Yes, on Android 10 and newer. Turn on <i>Record app sound</i> in Tools. A few apps block their sound from being recorded; the picture is still recorded.</p></details>
+      <details><summary>Where are my files?</summary><p>In <b>Download/Grabbit</b> on your phone. Videos and photos show up in your gallery, songs in your music player.</p></details>
+      <details><summary>A site stopped working. What do I do?</summary><p>Tap <b>Settings → Update engine</b>. Sites change how they work all the time and the engine is updated to keep up. If it still fails, <a href="https://github.com/ilukezippo/Grabbit/issues">report it</a>.</p></details>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Grabbit by <a href="https://github.com/ilukezippo">ilukezippo (BoYaqoub)</a>. MIT License. · <a href="https://ilukezippo.github.io/">More apps</a></span>
+    <nav aria-label="Links">
+      <a data-dl href="https://github.com/ilukezippo/Grabbit/releases/download/v1.0.0/Grabbit-1.0.0-arm64.apk">Download</a>
+      <a href="https://github.com/ilukezippo/Grabbit/issues">Report a problem</a>
+      <a href="https://github.com/ilukezippo/Grabbit/blob/main/PRIVACY.md">Privacy</a>
+      <a href="https://buymeacoffee.com/ilukezippo">Donate</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+(function () {
+  try {
+    fetch("https://api.github.com/repos/ilukezippo/Grabbit/releases/latest", { headers: { Accept: "application/vnd.github+json" } })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (rel) {
+        if (!rel || !rel.assets) return;
+        var apk = rel.assets.filter(function (a) { return /arm64.*\.apk$/i.test(a.name); })[0] ||
+                  rel.assets.filter(function (a) { return /\.apk$/i.test(a.name); })[0];
+        if (!apk) return;
+        document.querySelectorAll("[data-dl]").forEach(function (a) { a.href = apk.browser_download_url; });
+        var v = String(rel.tag_name || "").replace(/^v/, "");
+        if (v) document.querySelectorAll("[data-ver]").forEach(function (e) { e.textContent = v; });
+      })
+      .catch(function () {});
+  } catch (e) {}
+})();
+</script>
+<script>
+(function () {
+  function bg(svg) { return "url(\"data:image/svg+xml," + encodeURIComponent(svg) + "\")"; }
+  var CITY = bg('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 90"><defs><linearGradient id="a" x2="0" y2="1"><stop offset="0" stop-color="#0c0e28"/><stop offset="1" stop-color="#46205a"/></linearGradient></defs><rect width="160" height="90" fill="url(#a)"/><g fill="#12121e"><rect x="4" y="50" width="14" height="40"/><rect x="20" y="38" width="12" height="52"/><rect x="34" y="56" width="16" height="34"/><rect x="52" y="30" width="12" height="60"/><rect x="74" y="8" width="4" height="82"/><rect x="66" y="44" width="16" height="46"/><rect x="86" y="34" width="14" height="56"/><rect x="104" y="52" width="16" height="38"/><rect x="122" y="40" width="12" height="50"/><rect x="138" y="58" width="18" height="32"/></g><g fill="#ffc86e"><rect x="23" y="44" width="2" height="2"/><rect x="27" y="52" width="2" height="2"/><rect x="56" y="36" width="2" height="2"/><rect x="58" y="48" width="2" height="2"/><rect x="90" y="40" width="2" height="2"/><rect x="94" y="54" width="2" height="2"/><rect x="108" y="60" width="2" height="2"/><rect x="126" y="46" width="2" height="2"/><rect x="70" y="52" width="2" height="2"/><rect x="40" y="62" width="2" height="2"/></g></svg>');
+  var WAVES = bg('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 90"><defs><linearGradient id="a" x2="0" y2="1"><stop offset="0" stop-color="#28aadc"/><stop offset="1" stop-color="#0a285a"/></linearGradient></defs><rect width="160" height="90" fill="url(#a)"/><circle cx="24" cy="18" r="9" fill="#fffadc"/><g fill="none" stroke="#c8f0ff" stroke-width="1.2"><path d="M0 44q10-5 20 0t20 0 20 0 20 0 20 0 20 0 20 0 20 0"/><path d="M0 56q10-5 20 0t20 0 20 0 20 0 20 0 20 0 20 0 20 0"/><path d="M0 68q10-5 20 0t20 0 20 0 20 0 20 0 20 0 20 0 20 0"/></g></svg>');
+  var SUNSET = bg('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 90"><defs><linearGradient id="a" x2="0" y2="1"><stop offset="0" stop-color="#ff8c3c"/><stop offset="1" stop-color="#78285a"/></linearGradient></defs><rect width="160" height="90" fill="url(#a)"/><circle cx="110" cy="38" r="14" fill="#ffdc8c"/><path d="M0 60q40-10 80 0t80 0V90H0z" fill="#963c3c"/><path d="M0 72q40-8 80 0t80 0V90H0z" fill="#46202d"/></svg>');
+  var BRUNCH = bg('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 90"><defs><linearGradient id="a" x2="0" y2="1"><stop offset="0" stop-color="#ffc878"/><stop offset="1" stop-color="#f07850"/></linearGradient></defs><rect width="160" height="90" fill="url(#a)"/><circle cx="80" cy="45" r="30" fill="#fff"/><circle cx="80" cy="45" r="21" fill="#c84e32"/></svg>');
+  function tile(a, b) { return bg('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="' + a + '"/><circle cx="20" cy="20" r="11" fill="#fff"/><circle cx="20" cy="20" r="7" fill="' + b + '"/></svg>'); }
+
+  var SETS = {
+    video: { url: "https://youtu.be/k8Xx2", thumb: CITY, site: "YouTube", dur: "12:34", title: "Kuwait City skyline at night — 4K drone tour", who: "Gulf Drones",
+             groups: [["Quality", ["Best", "4K", "1080p", "720p", "480p"], 2], ["Format", ["MP4", "MKV", "WEBM"], 0]],
+             btn: "⬇ Download", done: function (s) { return "Saved " + s[1] + " " + s[0] + " to Download/Grabbit"; } },
+    music: { url: "https://soundcloud.com/waves/1-hour", thumb: WAVES, site: "SoundCloud", dur: "1:00:00", title: "Ocean waves — 1 hour relaxing sounds", who: "Calm Sounds",
+             groups: [["Format", ["MP3", "M4A", "OPUS"], 0]],
+             btn: "⬇ Download", done: function (s) { return "Saved the " + s[0] + " to Download/Grabbit"; } },
+    insta: { url: "https://www.instagram.com/p/C9xYz/", thumb: BRUNCH, site: "Instagram", count: "4 items", title: "Weekend brunch spots in Kuwait", who: "foodie.kw",
+             tiles: [tile("#ffc878", "#c84e32"), tile("#3aa37f", "#0c4f3b"), tile("#f0dcc0", "#a77a50"), tile("#b9a3ff", "#5b3fb8")],
+             btn: "⬇ Download all (4)", done: function () { return "Saved 4 photos and videos to Download/Grabbit"; } },
+    live:  { url: "https://www.twitch.tv/gulfsunsetcam", thumb: SUNSET, site: "Twitch", live: true, title: "LIVE: Gulf sunset cam 24/7", who: "gulfsunsetcam",
+             groups: [["Quality", ["Best", "1080p", "720p", "480p"], 2]],
+             btn: "● Record stream", done: function (s) { return "Recording at " + s[0] + "… tap Stop & save in Downloads"; } }
+  };
+  var $ = function (id) { return document.getElementById(id); };
+  var mode = "video", sel = [], timer = null;
+
+  function build() {
+    var s = SETS[mode];
+    clearInterval(timer);
+    $("url").textContent = s.url; $("thumb").style.backgroundImage = s.thumb;
+    $("title").textContent = s.title; $("who").textContent = s.who;
+    $("dur").style.display = s.dur ? "" : "none"; $("dur").textContent = s.dur || "";
+    $("tags").innerHTML = "<span>" + s.site + "</span>" + (s.live ? '<span class="live">LIVE</span>' : "") + (s.count ? '<span class="count">' + s.count + "</span>" : "");
+    var o = $("opts"); o.innerHTML = "";
+    if (mode === "video" || mode === "music") {
+      var seg = document.createElement("div"); seg.className = "seg";
+      ["Video", "Audio"].forEach(function (t) {
+        var b = document.createElement("button"); b.textContent = t;
+        b.setAttribute("aria-pressed", (t === "Audio") === (mode === "music") ? "true" : "false");
+        b.onclick = function () { switchTo(t === "Audio" ? "music" : "video"); };
+        seg.appendChild(b);
+      });
+      o.appendChild(seg);
+    }
+    sel = [];
+    (s.groups || []).forEach(function (g, gi) {
+      var l = document.createElement("div"); l.className = "lbl"; l.textContent = g[0]; o.appendChild(l);
+      var row = document.createElement("div"); row.className = "chips"; o.appendChild(row);
+      sel[gi] = g[1][g[2]];
+      g[1].forEach(function (c, ci) {
+        var b = document.createElement("button"); b.className = "chip"; b.textContent = c;
+        b.setAttribute("aria-pressed", ci === g[2] ? "true" : "false");
+        b.onclick = function () {
+          [].forEach.call(row.children, function (x) { x.setAttribute("aria-pressed", "false"); });
+          b.setAttribute("aria-pressed", "true"); sel[gi] = c; reset();
+          $("note").textContent = g[0] + ": " + c;
+        };
+        row.appendChild(b);
+      });
+    });
+    if (s.tiles) {
+      var t = document.createElement("div"); t.className = "tiles";
+      s.tiles.forEach(function (x) { var d = document.createElement("div"); d.style.backgroundImage = x; t.appendChild(d); });
+      o.appendChild(t);
+    }
+    reset();
+    document.querySelectorAll(".pill").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.mode === mode ? "true" : "false"); });
+    $("note").textContent = mode === "live" ? "Pick a quality, then Record stream." : "Tap a choice, then Download.";
+  }
+  function reset() { clearInterval(timer); var g = $("go"); g.classList.remove("done"); $("fill").style.width = "0"; $("goT").textContent = SETS[mode].btn; }
+  function switchTo(m) { if (m !== mode) { mode = m; build(); } }
+  $("go").onclick = function () {
+    var s = SETS[mode], p = 0;
+    if ($("go").classList.contains("done")) { reset(); return; }
+    clearInterval(timer);
+    timer = setInterval(function () {
+      p += mode === "live" ? 100 : 4;
+      $("fill").style.width = Math.min(p, 100) + "%";
+      $("goT").textContent = mode === "live" ? "● REC" : Math.min(p, 100) + "%";
+      if (p >= 100) {
+        clearInterval(timer);
+        $("go").classList.add("done"); $("fill").style.width = "0";
+        $("goT").textContent = mode === "live" ? "● Recording…" : "✓ Done";
+        $("note").textContent = s.done(sel);
+      }
+    }, 40);
+  };
+  document.querySelectorAll(".pill").forEach(function (b) { b.addEventListener("click", function () { switchTo(b.dataset.mode); }); });
+  build();
+})();
+</script>
+</body>
+</html>

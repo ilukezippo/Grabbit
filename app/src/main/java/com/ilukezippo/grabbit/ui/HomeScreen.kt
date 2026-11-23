@@ -133,7 +133,7 @@ private fun FeatureGrid() {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Feature(Icons.Rounded.HighQuality, "144p → 4K", Modifier.weight(1f))
-            Feature(Icons.Rounded.MusicNote, "MP3 · M4A · OPUS", Modifier.weight(1f))
+            Feature(Icons.Rounded.MusicNote, "MP3 · M4A", Modifier.weight(1f))
         }
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Feature(Icons.Rounded.PhotoLibrary, "Stories · Photos", Modifier.weight(1f))

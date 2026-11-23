@@ -104,8 +104,9 @@ private fun TaskRow(t: DownloadTask) {
         }
         if (t.status == Status.RUNNING) {
             Spacer(Modifier.height(10.dp))
-            if (t.progress >= 0 && !t.spec.isLive) LinearProgressIndicator({ t.progress / 100f }, Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)), color = G.pink, trackColor = G.surface2, strokeCap = StrokeCap.Round, gapSize = 0.dp, drawStopIndicator = {})
-            else LinearProgressIndicator(Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)), color = if (t.spec.isLive) G.red else G.pink, trackColor = G.surface2)
+            if (t.spec.isLive) LinearProgressIndicator({ 1f }, Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)), color = G.red, trackColor = G.surface2, strokeCap = StrokeCap.Round, gapSize = 0.dp, drawStopIndicator = {})
+            else if (t.progress >= 0) LinearProgressIndicator({ t.progress / 100f }, Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)), color = G.pink, trackColor = G.surface2, strokeCap = StrokeCap.Round, gapSize = 0.dp, drawStopIndicator = {})
+            else LinearProgressIndicator(Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)), color = G.pink, trackColor = G.surface2)
         }
         t.error?.takeIf { t.status == Status.FAILED }?.let { Text(it, color = G.muted, fontSize = 12.sp, maxLines = 3, modifier = Modifier.padding(top = 8.dp)) }
         Row(Modifier.fillMaxWidth().padding(top = 6.dp), horizontalArrangement = Arrangement.End) {

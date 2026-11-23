@@ -36,40 +36,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
             GrabbitTheme {
                 var current by tab
-                val active = Downloads.tasks.collectAsStateWithLifecycle().value.count { it.active }
-                Scaffold(
-                    containerColor = G.bg,
-                    bottomBar = {
-                        NavigationBar(containerColor = G.surface, tonalElevation = androidx.compose.ui.unit.Dp(0f)) {
-                            val items = listOf(
-                                Triple(R.string.tab_home, Icons.Rounded.Bolt, Icons.Rounded.Bolt),
-                                Triple(R.string.tab_downloads, Icons.Rounded.Download, Icons.Rounded.Download),
-                                Triple(R.string.tab_tools, Icons.Rounded.AutoAwesome, Icons.Rounded.AutoAwesome),
-                                Triple(R.string.tab_settings, Icons.Rounded.Settings, Icons.Rounded.Settings),
-                            )
-                            items.forEachIndexed { i, (label, icon, _) ->
-                                NavigationBarItem(
-                                    selected = current == i, onClick = { current = i },
-                                    icon = {
-                                        if (i == 1 && active > 0) BadgedBox({ Badge(containerColor = G.pink) { Text("$active", fontSize = 10.sp) } }) { Icon(icon, null) }
-                                        else Icon(icon, null)
-                                    },
-                                    label = { Text(stringResource(label)) },
-                                    colors = NavigationBarItemDefaults.colors(selectedIconColor = G.text, indicatorColor = G.violet.copy(alpha = .35f), unselectedIconColor = G.muted, unselectedTextColor = G.muted, selectedTextColor = G.text),
-                                )
-                            }
-                        }
-                    },
-                ) { pad ->
-                    Box(Modifier.padding(pad).statusBarsPadding()) {
-                        when (current) {
-                            0 -> HomeScreen(vm) { current = 1 }
-                            1 -> DownloadsScreen()
-                            2 -> ToolsScreen()
-                            else -> SettingsScreen()
-                        }
-                    }
-                }
+                AppScaffold(vm, current) { current = it }
             }
         }
     }
