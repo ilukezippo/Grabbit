@@ -114,4 +114,5 @@
     <string name="err_ig_busy">Instagram is limiting requests right now. Try again in a few minutes.</string>
     <string name="err_ig_gone">This post isn\'t available. It may have been deleted, or the account is private and you don\'t follow it.</string>
     <string name="err_ig_failed">Instagram didn\'t return this. %s</string>
+    <string name="err_ig_story_steps">Instagram didn\'t give Grabbit this story. Please send a screenshot of this message to the developer.\n\n%s</string>
 </resources>

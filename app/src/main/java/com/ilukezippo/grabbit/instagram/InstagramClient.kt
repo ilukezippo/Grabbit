@@ -9,6 +9,9 @@ import org.json.JSONObject
 
 class IgNoStories(val user: String) : Exception("No active stories for @$user")
 
+/** Every way of reading a story failed; [steps] says what Instagram answered at each. */
+class IgStepsError(val steps: List<String>) : Exception(steps.joinToString(" · "))
+
 /** Uses the signed-in web session to read posts, carousels (photos + videos) and stories. */
 class InstagramClient(private val ctx: Context) {
     private suspend fun api(path: String) = InstagramWeb.api(ctx, path)
@@ -29,18 +32,43 @@ class InstagramClient(private val ctx: Context) {
     }
 
     private suspend fun story(username: String, mediaId: String?, url: String): MediaInfo {
-        val userId = api("users/web_profile_info/?username=$username").getJSONObject("data").getJSONObject("user").getString("id")
-        val reels = api("feed/reels_media/?reel_ids=$userId")
-        val reel = reels.optJSONObject("reels")?.optJSONObject(userId)
-            ?: reels.optJSONArray("reels_media")?.optJSONObject(0)
+        val steps = mutableListOf<String>()
+        fun note(step: String, e: Throwable) {
+            steps += "$step: " + ((e as? InstagramWeb.IgHttpError)?.code?.let { "HTTP $it" } ?: e.message?.take(60) ?: e.javaClass.simpleName)
+        }
+        // 1. A link to one story item: ask for that item directly.
+        if (mediaId != null) {
+            try {
+                val items = api("media/$mediaId/info/").getJSONArray("items")
+                val list = (0 until items.length()).map { toDirect(items.getJSONObject(it)) }
+                if (list.isNotEmpty()) return storyInfo(username, url, list)
+            } catch (e: Throwable) { note("item", e) }
+        }
+        // 2. The user's whole current story: user id, then their reel.
+        val userId = try {
+            api("users/web_profile_info/?username=$username").getJSONObject("data").getJSONObject("user").getString("id")
+        } catch (e: Throwable) {
+            note("profile", e)
+            try {
+                val html = InstagramWeb.page(ctx, "stories/$username/")
+                Regex(""""(?:profile_id|owner_id|user_id)"\s*:\s*"(\d+)"""").find(html)?.groupValues?.get(1)
+                    ?: Regex(""""user"\s*:\s*\{[^{}]*?"pk"\s*:\s*"?(\d+)""").find(html)?.groupValues?.get(1)
+                    ?: error("no user id in page")
+            } catch (e2: Throwable) { note("page", e2); throw IgStepsError(steps) }
+        }
+        val reels = try { api("feed/reels_media/?reel_ids=$userId") } catch (e: Throwable) { note("reel", e); throw IgStepsError(steps) }
+        val reel = reels.optJSONObject("reels")?.optJSONObject(userId) ?: reels.optJSONArray("reels_media")?.optJSONObject(0)
             ?: throw IgNoStories(username)
         val arr = reel.getJSONArray("items")
         var list = (0 until arr.length()).map { arr.getJSONObject(it) }
         if (mediaId != null) list = list.filter { it.optString("pk") == mediaId || it.optString("id").startsWith(mediaId) }.ifEmpty { list }
         val items = list.map { toDirect(it) }
         if (items.isEmpty()) throw IgNoStories(username)
-        return MediaInfo(url, "${username}_story", items.first().thumb, 0, username, "Instagram Story", emptyList(), false, items.size, items)
+        return storyInfo(username, url, items)
     }
+
+    private fun storyInfo(username: String, url: String, items: List<DirectItem>) =
+        MediaInfo(url, "${username}_story", items.first().thumb, 0, username, "Instagram Story", emptyList(), false, items.size, items)
 
     private fun toDirect(m: JSONObject): DirectItem {
         val img = m.optJSONObject("image_versions2")?.optJSONArray("candidates")?.optJSONObject(0)?.optString("url")

@@ -6,6 +6,7 @@ import com.ilukezippo.grabbit.core.InstagramIds
 import com.ilukezippo.grabbit.core.IgTarget
 import com.ilukezippo.grabbit.instagram.InstagramClient
 import com.ilukezippo.grabbit.instagram.IgNoStories
+import com.ilukezippo.grabbit.instagram.IgStepsError
 import com.ilukezippo.grabbit.instagram.InstagramSession
 import com.ilukezippo.grabbit.instagram.InstagramWeb
 import kotlinx.coroutines.Dispatchers
@@ -45,11 +46,12 @@ object Resolver {
     }
 
     private fun igMessage(ctx: Context, e: Throwable?, user: String?): String = when {
+        e is IgStepsError -> ctx.getString(R.string.err_ig_story_steps, e.steps.joinToString(" · "))
         e is IgNoStories -> ctx.getString(R.string.err_ig_no_story, e.user)
         e is InstagramWeb.IgHttpError && e.code == 429 -> ctx.getString(R.string.err_ig_busy)
         e is InstagramWeb.IgHttpError && (e.code == 401 || e.code == 403 || "login_required" in (e.message ?: "")) ->
             ctx.getString(R.string.err_ig_session)
-        e is InstagramWeb.IgHttpError && e.code == 404 -> ctx.getString(R.string.err_ig_gone)
+        e is InstagramWeb.IgHttpError && e.code == 404 -> ctx.getString(R.string.err_ig_gone) + "\n(post: HTTP 404)"
         else -> ctx.getString(R.string.err_ig_failed, (e?.message ?: "").take(160))
     }
 

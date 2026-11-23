@@ -118,4 +118,5 @@
     <string name="err_ig_busy">إنستغرام يحدّ من الطلبات الآن. حاول مرة أخرى بعد بضع دقائق.</string>
     <string name="err_ig_gone">هذا المنشور غير متاح. ربما حُذف، أو أن الحساب خاص ولا تتابعه.</string>
     <string name="err_ig_failed">لم يُرجع إنستغرام هذا المحتوى. %s</string>
+    <string name="err_ig_story_steps">لم يُعطِ إنستغرام هذه القصة لـ Grabbit. يرجى إرسال لقطة شاشة لهذه الرسالة إلى المطوّر.\n\n%s</string>
 </resources>

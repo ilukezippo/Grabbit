@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.5 — 2026-11-23
+
+- **Instagram stories:** a link to one story is now fetched directly by its id; for a whole story, Grabbit finds the account from its profile or its story page
+- If Instagram still refuses, the message says which step failed and what Instagram answered
+
 ## 1.0.4 — 2026-11-23
 
 - **Fixed:** Instagram stories said *You need to log in* even when signed in. Instagram refuses story requests that don't come from a real browser, so Grabbit now asks through the same built-in browser you signed in with

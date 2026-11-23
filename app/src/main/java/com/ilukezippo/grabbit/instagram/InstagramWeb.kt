@@ -62,27 +62,39 @@ object InstagramWeb {
         return d
     }
 
-    /** GET https://www.instagram.com/api/v1/[path] as the signed-in browser. */
-    suspend fun api(ctx: Context, path: String): JSONObject = lock.withLock {
+    /** GET any www.instagram.com URL as the signed-in browser; returns (status, body). */
+    suspend fun fetch(ctx: Context, fullUrl: String, apiHeaders: Boolean): Pair<Int, String> = lock.withLock {
         try { withTimeout(30_000) { ensure(ctx).await() } } catch (e: Exception) { ready = null; throw e }
         val id = ids.incrementAndGet()
         val result = CompletableDeferred<Pair<Int, String>>()
         pending[id] = result
-        val url = JSONObject.quote(ORIGIN + "api/v1/" + path)
+        val url = JSONObject.quote(fullUrl)
+        val headers = if (apiHeaders) """{'X-IG-App-ID':'936619743392459','X-ASBD-ID':'359341','X-IG-WWW-Claim':'0',
+                'X-Requested-With':'XMLHttpRequest','X-CSRFToken': m ? m[1] : '', 'Accept':'*/*'}""" else "{}"
         val js = """
             (function(){
               var m = document.cookie.match(/(?:^|; )csrftoken=([^;]+)/);
-              fetch($url, {credentials:'include', headers:{
-                'X-IG-App-ID':'936619743392459','X-ASBD-ID':'359341','X-IG-WWW-Claim':'0',
-                'X-Requested-With':'XMLHttpRequest','X-CSRFToken': m ? m[1] : '', 'Accept':'*/*'}})
+              fetch($url, {credentials:'include', headers:$headers})
               .then(function(r){ return r.text().then(function(t){ GrabbitIg.done($id, r.status, t); }); })
               .catch(function(e){ GrabbitIg.fail($id, String(e)); });
             })();
         """.trimIndent()
         withContext(Dispatchers.Main) { web?.evaluateJavascript(js, null) }
-        val (status, body) = try { withTimeout(30_000) { result.await() } } finally { pending.remove(id) }
+        try { withTimeout(30_000) { result.await() } } finally { pending.remove(id) }
+    }
+
+    /** GET https://www.instagram.com/api/v1/[path] as the signed-in browser. */
+    suspend fun api(ctx: Context, path: String): JSONObject {
+        val (status, body) = fetch(ctx, ORIGIN + "api/v1/" + path, apiHeaders = true)
         if (status !in 200..299 || !body.trimStart().startsWith("{")) throw IgHttpError(status, body)
-        JSONObject(body)
+        return JSONObject(body)
+    }
+
+    /** An Instagram web page's HTML, as the signed-in browser sees it. */
+    suspend fun page(ctx: Context, path: String): String {
+        val (status, body) = fetch(ctx, ORIGIN + path.removePrefix("/"), apiHeaders = false)
+        if (status !in 200..299) throw IgHttpError(status, body)
+        return body
     }
 
     /** Copies the browser's current Instagram cookies into the files yt-dlp uses. */
