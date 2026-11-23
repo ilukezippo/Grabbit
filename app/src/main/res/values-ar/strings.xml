@@ -106,9 +106,7 @@
     <string name="upd_title">يتوفر Grabbit %s</string>
     <string name="upd_desc">لديك الإصدار %s. حدّث للحصول على أحدث الإصلاحات والميزات.</string>
     <string name="upd_now">تحديث</string>
-    <string name="upd_downloading">جارٍ تنزيل التحديث… %d%%</string>
-    <string name="upd_allow">اسمح لـ Grabbit بتثبيت التحديثات، ثم اضغط «تحديث» مرة أخرى.</string>
-    <string name="upd_failed">فشل التحديث: %s</string>
+    <string name="upd_then_open">يقوم المتصفح بتنزيله الآن. عند انتهائه اضغط على الملف لتثبيته. تبقى تنزيلاتك وإعداداتك كما هي.</string>
     <string name="upd_section">تحديثات التطبيق</string>
     <string name="upd_check">البحث عن تحديثات</string>
     <string name="upd_checking">جارٍ البحث…</string>

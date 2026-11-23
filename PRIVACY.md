@@ -8,7 +8,7 @@ Only what you ask for:
 
 - **Links you grab.** Grabbit connects to the site the link points to (YouTube, Instagram, X…) to read the video or photo and download it, the same way a browser would.
 - **X (Twitter) photo posts** are read through the public `api.fxtwitter.com` service, which receives the post's link.
-- **App update check.** When Grabbit starts (at most every 6 hours) it asks GitHub for the latest release. If you tap *Update*, it downloads the new APK from GitHub.
+- **App update check.** When Grabbit starts (at most every 6 hours) it asks GitHub for the latest release. If you tap *Update*, your browser downloads the new APK from GitHub.
 - **Engine update.** When you tap *Update engine*, Grabbit downloads the newest yt-dlp from its official GitHub releases.
 
 ## What stays on your phone
@@ -24,7 +24,6 @@ Only what you ask for:
 | Internet | Download what you ask for |
 | Notifications | Show download and recording progress |
 | Record audio | Only for the screen recorder's *Record app sound* option (Android 10+); it captures the sound apps play, not the microphone |
-| Install apps | Only to open Android's installer for a Grabbit update you tapped |
 | Display over other apps | Only for the floating stop bubble while recording |
 | Storage (Android 9 and older) | Save files to the Download folder |
 

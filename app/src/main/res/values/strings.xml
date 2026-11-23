@@ -102,9 +102,7 @@
     <string name="upd_title">Grabbit %s is available</string>
     <string name="upd_desc">You have %s. Update to get the newest fixes and features.</string>
     <string name="upd_now">Update</string>
-    <string name="upd_downloading">Downloading update… %d%%</string>
-    <string name="upd_allow">Allow Grabbit to install updates, then tap Update again.</string>
-    <string name="upd_failed">Update failed: %s</string>
+    <string name="upd_then_open">Your browser is downloading it. When it finishes, tap the download to install. Your downloads and settings are kept.</string>
     <string name="upd_section">App updates</string>
     <string name="upd_check">Check for updates</string>
     <string name="upd_checking">Checking…</string>

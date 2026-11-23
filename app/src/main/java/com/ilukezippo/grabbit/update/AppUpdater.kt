@@ -4,20 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.provider.Settings
-import androidx.core.content.FileProvider
 import com.ilukezippo.grabbit.BuildConfigInfo
 import com.ilukezippo.grabbit.core.Versions
 import com.ilukezippo.grabbit.engine.Http
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
-import okhttp3.Request
 import org.json.JSONObject
-import java.io.File
-import kotlin.coroutines.coroutineContext
 
 data class AppUpdate(val version: String, val apkName: String, val apkUrl: String, val pageUrl: String, val notes: String)
 
@@ -56,42 +50,9 @@ object AppUpdater {
         return AppUpdate(tag.removePrefix("v"), name, url, j.optString("html_url"), j.optString("body").take(600))
     }
 
-    fun canInstall(ctx: Context) = Build.VERSION.SDK_INT < 26 || ctx.packageManager.canRequestPackageInstalls()
-
-    /** Opens the system screen where the user allows Grabbit to install updates. */
-    fun askInstallPermission(ctx: Context) {
-        if (Build.VERSION.SDK_INT >= 26) ctx.startActivity(
-            Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:${ctx.packageName}")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        )
-    }
-
-    /** Downloads the APK and hands it to Android's installer. */
-    suspend fun downloadAndInstall(ctx: Context, u: AppUpdate, onProgress: (Float) -> Unit) {
-        val apk = withContext(Dispatchers.IO) {
-            val dir = File(ctx.cacheDir, "update").apply { deleteRecursively(); mkdirs() }
-            val out = File(dir, u.apkName)
-            Http.client.newCall(Request.Builder().url(u.apkUrl).header("User-Agent", Http.MOBILE_UA).build()).execute().use { r ->
-                if (!r.isSuccessful) error("HTTP ${r.code}")
-                val body = r.body ?: error("Empty download")
-                val total = body.contentLength()
-                body.byteStream().use { input ->
-                    out.outputStream().use { o ->
-                        val buf = ByteArray(128 * 1024); var done = 0L
-                        while (true) {
-                            coroutineContext.ensureActive()
-                            val n = input.read(buf); if (n < 0) break
-                            o.write(buf, 0, n); done += n
-                            if (total > 0) withContext(Dispatchers.Main) { onProgress(done * 100f / total) }
-                        }
-                    }
-                }
-            }
-            out
-        }
-        val uri = FileProvider.getUriForFile(ctx, "${ctx.packageName}.files", apk)
-        ctx.startActivity(
-            Intent(Intent.ACTION_VIEW).setDataAndType(uri, "application/vnd.android.package-archive")
-                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
-        )
+    /** Opens the APK link in the browser, which downloads it; tapping the download installs it.
+     *  (No "install other apps" permission: some phones refuse to sideload apps that request it.) */
+    fun openDownload(ctx: Context, u: AppUpdate) {
+        ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(u.apkUrl)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
 }

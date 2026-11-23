@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3 — 2026-11-23
+
+- **Fixed:** 1.0.2 couldn't be installed on some phones ("App not installed"). Grabbit no longer asks for the *install other apps* permission: **Update** now downloads the new version through your browser, and you tap the download to install it
+
 ## 1.0.2 — 2026-11-23
 
 - **App updates:** Grabbit checks GitHub for a new version when it starts and shows a card with an **Update** button that downloads it and opens the installer. *Check for updates* is in Settings too

@@ -101,7 +101,7 @@ Everything that changed is in the [changelog](CHANGELOG.md).
 - **Screen recorder:** records the screen with the sound apps play (Android 10+), with a floating bubble that shows the time and stops with a tap
 - **Converter:** turn any video or audio on your phone into MP3, M4A, OPUS, MP4, MKV, WEBM or GIF
 - **Downloads tab:** two at a time, progress and time left, cancel, retry, open and share, kept after a restart
-- **Updates built in:** checks this GitHub page when it starts and offers *Update*, which downloads and installs the new version
+- **Updates built in:** checks this GitHub page when it starts and offers *Update*, which downloads the new version for you to install
 - **Arabic and English**, dark design
 - **No ads, no account, no tracking.** See the [privacy policy](PRIVACY.md)
 

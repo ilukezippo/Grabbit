@@ -23,14 +23,11 @@ import com.ilukezippo.grabbit.BuildConfigInfo
 import com.ilukezippo.grabbit.R
 import com.ilukezippo.grabbit.update.AppUpdate
 import com.ilukezippo.grabbit.update.AppUpdater
-import kotlinx.coroutines.launch
 
 /** "Grabbit x.y is available" card with an Update button that downloads and opens the installer. */
 @Composable
 fun UpdateBanner(u: AppUpdate) {
     val ctx = LocalContext.current
-    val scope = rememberCoroutineScope()
-    var progress by remember { mutableStateOf<Float?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
     val shape = RoundedCornerShape(20.dp)
     Column(
@@ -47,24 +44,10 @@ fun UpdateBanner(u: AppUpdate) {
                 Text(stringResource(R.string.upd_desc, BuildConfigInfo.versionName(ctx)), color = G.muted, fontSize = 13.sp)
             }
         }
-        val p = progress
-        if (p != null) {
-            Text(stringResource(R.string.upd_downloading, p.toInt()), color = G.text, fontSize = 13.sp)
-            LinearProgressIndicator({ p / 100f }, Modifier.fillMaxWidth(), color = G.pink, trackColor = G.surface2)
-        } else Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            GradientButton({
-                if (!AppUpdater.canInstall(ctx)) {
-                    message = ctx.getString(R.string.upd_allow)
-                    AppUpdater.askInstallPermission(ctx)
-                    return@GradientButton
-                }
-                message = null; progress = 0f
-                scope.launch {
-                    runCatching { AppUpdater.downloadAndInstall(ctx, u) { progress = it } }
-                        .onFailure { message = ctx.getString(R.string.upd_failed, it.message ?: "") }
-                    progress = null
-                }
-            }, Modifier.weight(1f)) { Text(stringResource(R.string.upd_now)) }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            GradientButton({ AppUpdater.openDownload(ctx, u); message = ctx.getString(R.string.upd_then_open) }, Modifier.weight(1f)) {
+                Text(stringResource(R.string.upd_now))
+            }
             TextButton({ ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(u.pageUrl))) }) { Text(stringResource(R.string.upd_whats_new)) }
         }
         message?.let { Text(it, color = G.muted, fontSize = 13.sp) }
