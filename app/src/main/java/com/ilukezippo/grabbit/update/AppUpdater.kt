@@ -43,12 +43,17 @@ object AppUpdater {
     private fun parse(ctx: Context, j: JSONObject): AppUpdate? {
         val tag = j.optString("tag_name")
         if (!Versions.isNewer(tag, BuildConfigInfo.versionName(ctx))) return null
+        val skipped = ctx.getSharedPreferences("prefs", Context.MODE_PRIVATE).getString("skipUpdate", null)
+        if (skipped != null && !Versions.isNewer(tag, skipped)) return null
         val assets = j.optJSONArray("assets") ?: return null
         val all = (0 until assets.length()).map { assets.getJSONObject(it) }
         val name = Versions.pickApk(all.map { it.optString("name") }, Build.SUPPORTED_ABIS.firstOrNull() ?: "arm64-v8a") ?: return null
         val url = all.first { it.optString("name") == name }.optString("browser_download_url")
         return AppUpdate(tag.removePrefix("v"), name, url, j.optString("html_url"), j.optString("body").take(600))
     }
+
+    /** Hides the card until a newer version than the skipped one comes out. */
+    fun dismiss() { _available.value = null }
 
     /** Opens the APK link in the browser, which downloads it; tapping the download installs it.
      *  (No "install other apps" permission: some phones refuse to sideload apps that request it.) */

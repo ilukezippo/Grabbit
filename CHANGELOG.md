@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.6 — 2026-11-23
+
+- **Edit downloads:** tap **Edit** (or long-press an item), select several or **Select all**, then **Convert**, **Clear** or **Delete**. *Clear* only takes items off the list; *Delete* also removes the files from your phone, after asking
+- Finished items show just **Share**; tap the card to open the file
+- **Ask every time or download right away:** Settings → Default download → *When I grab a link*. With *Download right away*, sharing a link starts the download with your saved quality and format (live streams still ask)
+- **Download complete** notification: tap it to open the file
+- **Later** on the update card hides it until the next version
+- **Fixed:** the clipboard link card sometimes didn't appear on Android 10+; it also no longer offers a link you already grabbed
+- **Fixed:** Paste with no link in the clipboard now says so
+- **Fixed:** on Android 10, deleting files from before a reinstall said *Deleted* when it couldn't
+
 ## 1.0.5 — 2026-11-23
 
 - **Instagram stories:** a link to one story is now fetched directly by its id; for a whole story, Grabbit finds the account from its profile or its story page

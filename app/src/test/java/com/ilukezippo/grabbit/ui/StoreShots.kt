@@ -65,7 +65,9 @@ class StoreShots {
         shot("instagram", 0, GrabViewModel(app).apply { showForPreview(ig.url, ig) })
     }
 
-    @Test fun d_downloads() {
+    @Test fun d_downloads() { d_downloadsSetup(); shot("downloads", 1) }
+
+    private fun d_downloadsSetup() {
         fun f(n: String, mime: String, size: Long) = SavedFile("content://x/$n", n, mime, size)
         Downloads.setForPreview(listOf(
             DownloadTask("1", DownloadSpec("u", "Kuwait City skyline at night — 4K drone tour", thumb("city.jpg"), Choice.Video(2160, VideoContainer.MP4)),
@@ -78,7 +80,13 @@ class StoreShots {
             DownloadTask("5", DownloadSpec("u", "Alps timelapse in 8K", thumb("mountains.jpg"), Choice.Video(1080, VideoContainer.MKV)),
                 Status.DONE, 100f, files = listOf(f("alps.mkv", "video/x-matroska", 412_000_000))),
         ))
-        shot("downloads", 1)
+    }
+
+    @Test fun h_edit() {
+        d_downloadsSetup()
+        captureRoboImage("build/store/edit.png") {
+            GrabbitTheme { Box(Modifier.fillMaxSize().background(G.bg)) { DownloadsScreen(previewEditing = true, previewSelected = setOf("3", "5")) } }
+        }
     }
 
     @Test fun e_tools() = shot("tools", 2)

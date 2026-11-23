@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -50,12 +51,9 @@ fun HomeScreen(vm: GrabViewModel, onQueued: () -> Unit) {
     val input by vm.input.collectAsStateWithLifecycle()
     val engine by Engine.state.collectAsStateWithLifecycle()
     var clip by remember { mutableStateOf<String?>(null) }
-    val owner = LocalLifecycleOwner.current
-    DisposableEffect(owner) {
-        val obs = LifecycleEventObserver { _, e -> if (e == Lifecycle.Event.ON_RESUME) clip = clipboardLink(ctx) }
-        owner.lifecycle.addObserver(obs)
-        onDispose { owner.lifecycle.removeObserver(obs) }
-    }
+    // Android 10+ only lets an app read the clipboard once its window has focus, which comes after onResume.
+    val focused = LocalWindowInfo.current.isWindowFocused
+    LaunchedEffect(focused) { if (focused) clip = clipboardLink(ctx)?.takeIf { it != Prefs(ctx).lastGrabbed } }
 
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(top = 12.dp, bottom = 24.dp),
@@ -77,7 +75,11 @@ fun HomeScreen(vm: GrabViewModel, onQueued: () -> Unit) {
                 leadingIcon = { Icon(Icons.Rounded.Link, null, tint = G.violet) },
                 trailingIcon = {
                     if (input.isNotEmpty()) IconButton({ vm.reset() }) { Icon(Icons.Rounded.Close, stringResource(R.string.clear)) }
-                    else IconButton({ clipboardLink(ctx)?.let { vm.input.value = it; vm.grab(it) } }) { Icon(Icons.Rounded.ContentPaste, stringResource(R.string.paste)) }
+                    else IconButton({
+                        val link = clipboardLink(ctx)
+                        if (link != null) { vm.input.value = link; vm.grab(link) }
+                        else Toast.makeText(ctx, R.string.no_clip_link, Toast.LENGTH_SHORT).show()
+                    }) { Icon(Icons.Rounded.ContentPaste, stringResource(R.string.paste)) }
                 },
                 singleLine = true, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Go),
@@ -112,6 +114,14 @@ fun HomeScreen(vm: GrabViewModel, onQueued: () -> Unit) {
             }
             is EngineState.Failed -> Text(stringResource(R.string.engine_failed, e.message), color = G.red, fontSize = 13.sp)
             else -> {}
+        }
+
+        val queued = state as? GrabState.Queued
+        LaunchedEffect(queued) {
+            if (queued != null) {
+                Toast.makeText(ctx, ctx.getString(R.string.auto_started, queued.label), Toast.LENGTH_SHORT).show()
+                vm.reset(); onQueued()
+            }
         }
 
         AnimatedContent(state, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "grab") { s ->

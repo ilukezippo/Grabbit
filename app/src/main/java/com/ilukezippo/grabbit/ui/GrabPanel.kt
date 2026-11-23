@@ -106,7 +106,7 @@ fun GrabPanel(info: MediaInfo, onDownload: (Choice?) -> Unit) {
         var audio by remember { mutableStateOf(prefs.audioMode && !info.isLive) }
         val heights = info.heights
         var height by remember {
-            mutableStateOf<Int?>(if (prefs.height == 0 || heights.isEmpty()) null else heights.firstOrNull { it <= prefs.height } ?: heights.last())
+            mutableStateOf((com.ilukezippo.grabbit.core.DefaultChoice.pick(false, prefs.height, prefs.container, prefs.audioFormat, heights) as Choice.Video).height)
         }
         var container by remember { mutableStateOf(prefs.container) }
         var afmt by remember { mutableStateOf(prefs.audioFormat) }

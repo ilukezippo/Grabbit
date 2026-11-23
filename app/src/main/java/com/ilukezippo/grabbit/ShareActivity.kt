@@ -44,6 +44,10 @@ class ShareActivity : AppCompatActivity() {
                                 Toast.makeText(this@ShareActivity, R.string.added_queue, Toast.LENGTH_SHORT).show()
                                 finish()
                             }
+                            is GrabState.Queued -> LaunchedEffect(s) {
+                                Toast.makeText(this@ShareActivity, getString(R.string.auto_started, s.label), Toast.LENGTH_SHORT).show()
+                                finish()
+                            }
                             is GrabState.Error -> {
                                 Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(G.red.copy(alpha = .12f)).padding(14.dp)) {
                                     Icon(Icons.Rounded.ErrorOutline, null, tint = G.red); Spacer(Modifier.width(10.dp)); Text(s.message)

@@ -1,9 +1,11 @@
 package com.ilukezippo.grabbit.download
 
 import android.content.Context
+import android.net.Uri
 import android.content.Intent
 import androidx.core.content.ContextCompat
 import com.ilukezippo.grabbit.GrabbitApp
+import com.ilukezippo.grabbit.Notifications
 import com.ilukezippo.grabbit.core.Choice
 import com.ilukezippo.grabbit.core.FileNames
 import com.ilukezippo.grabbit.core.FormatSelector
@@ -11,7 +13,9 @@ import com.ilukezippo.grabbit.engine.Engine
 import com.ilukezippo.grabbit.engine.FFmpegRunner
 import com.ilukezippo.grabbit.engine.Http
 import com.yausername.youtubedl_android.YoutubeDL
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -72,7 +76,71 @@ object Downloads {
     }
 
     /** Screenshots/tests only. */
-    fun setForPreview(list: List<DownloadTask>) { _tasks.value = list }
+    fun setForPreview(list: List<DownloadTask>) { _tasks.value = list; lastDeleted = emptyList() }
+
+    // ---- editing the list ----
+
+    /** Takes items off the list. Their files stay on the phone. */
+    fun clear(ctx: Context, ids: Set<String>) {
+        _tasks.update { list -> list.filterNot { it.id in ids && !it.active } }
+        saveHistory(ctx)
+    }
+
+    /** URIs of files deleted by the last [deleteFiles] call (for tests). */
+    var lastDeleted: List<String> = emptyList()
+        private set
+
+    /** What [deleteFiles] couldn't do alone: files Android wants the user to confirm deleting. */
+    data class DeleteOutcome(val needConsent: List<Uri>, val consentIds: Set<String>)
+
+    /** Deletes the items' files from the phone and takes them off the list. */
+    suspend fun deleteFiles(ctx: Context, ids: Set<String>): DeleteOutcome = withContext(Dispatchers.IO) {
+        val deleted = mutableListOf<String>()
+        val needConsent = mutableListOf<Uri>()
+        val consentIds = mutableSetOf<String>()
+        val done = mutableSetOf<String>()
+        _tasks.value.filter { it.id in ids && !it.active }.forEach { t ->
+            var blocked = false
+            t.files.forEach { f ->
+                val uri = Uri.parse(f.uri)
+                try {
+                    ctx.contentResolver.delete(uri, null, null)
+                    deleted += f.uri
+                } catch (e: SecurityException) {
+                    // A file from before a reinstall: Android asks the user to confirm.
+                    needConsent += uri; blocked = true
+                } catch (e: Exception) {
+                    deleted += f.uri // already gone or unreadable: nothing left to delete
+                }
+            }
+            if (blocked) consentIds += t.id else done += t.id
+        }
+        lastDeleted = deleted
+        withContext(Dispatchers.Main) { clear(ctx, done) }
+        DeleteOutcome(needConsent, consentIds)
+    }
+
+    /** Converts each item's media files to [target] ("mp3", "mp4"…) as new entries in the list. */
+    fun convert(ctx: Context, ids: Set<String>, target: String) {
+        _tasks.value.filter { it.id in ids && it.status == Status.DONE }.flatMap { t -> t.files.map { t to it } }
+            .filter { (_, f) -> f.mime.startsWith("video") || f.mime.startsWith("audio") }
+            .forEach { (t, f) ->
+                enqueue(ctx, DownloadSpec(f.uri, "${f.name.substringBeforeLast('.')} → ${target.uppercase()}", t.spec.thumbnail, null,
+                    convertFrom = f, convertTo = target))
+            }
+    }
+
+    private suspend fun convertFile(app: GrabbitApp, task: DownloadTask, tmp: File): List<File> {
+        val src = task.spec.convertFrom ?: error("Nothing to convert")
+        val target = task.spec.convertTo ?: error("No format")
+        val input = File(tmp, "in." + src.name.substringAfterLast('.', "bin"))
+        app.contentResolver.openInputStream(Uri.parse(src.uri))!!.use { i -> input.outputStream().use { i.copyTo(it) } }
+        val out = File(tmp, FileNames.sanitize(src.name.substringBeforeLast('.')) + "." + target)
+        set(task.id) { it.copy(progress = 0f, detail = "") }
+        FFmpegRunner.run(app, FFmpegRunner.convertArgs(input, out)) { p -> set(task.id) { it.copy(progress = p) } }
+        input.delete()
+        return listOf(out)
+    }
 
     fun addExternal(ctx: Context, title: String, file: SavedFile) {
         val t = DownloadTask(UUID.randomUUID().toString().take(8), DownloadSpec(file.uri, title, null, null),
@@ -91,10 +159,15 @@ object Downloads {
         set(id) { it.copy(status = Status.RUNNING, progress = -1f) }
         val tmp = File(app.cacheDir, "dl/$id").apply { deleteRecursively(); mkdirs() }
         try {
-            val produced = if (task.spec.direct.isNotEmpty()) fetchDirect(task, tmp) else fetchWithYtDlp(app, task, tmp)
+            val produced = when {
+                task.spec.convertTo != null -> convertFile(app, task, tmp)
+                task.spec.direct.isNotEmpty() -> fetchDirect(task, tmp)
+                else -> fetchWithYtDlp(app, task, tmp)
+            }
             val saved = produced.map { MediaSaver.save(app, it) }
             if (saved.isEmpty()) error("Nothing was downloaded")
             set(id) { it.copy(status = Status.DONE, progress = 100f, files = saved, detail = "") }
+            Notifications.done(app, id, task.spec.title, saved.first(), failed = false)
         } catch (e: Throwable) {
             val stoppedLive = id in stopAndSave
             if (stoppedLive) {
@@ -106,6 +179,7 @@ object Downloads {
                 val msg = (e.message ?: e.toString()).lines().firstOrNull { "ERROR" in it }?.substringAfter("ERROR:")?.trim()
                     ?: e.message?.lines()?.firstOrNull() ?: e.toString()
                 set(id) { it.copy(status = Status.FAILED, error = msg.take(240)) }
+                Notifications.done(app, id, task.spec.title, null, failed = true)
             }
         } finally {
             stopAndSave -= id

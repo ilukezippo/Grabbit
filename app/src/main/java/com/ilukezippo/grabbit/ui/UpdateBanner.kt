@@ -49,6 +49,7 @@ fun UpdateBanner(u: AppUpdate) {
                 Text(stringResource(R.string.upd_now))
             }
             TextButton({ ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(u.pageUrl))) }) { Text(stringResource(R.string.upd_whats_new)) }
+            TextButton({ Prefs(ctx).skippedUpdate = u.version; AppUpdater.dismiss() }) { Text(stringResource(R.string.upd_later), color = G.muted) }
         }
         message?.let { Text(it, color = G.muted, fontSize = 13.sp) }
     }

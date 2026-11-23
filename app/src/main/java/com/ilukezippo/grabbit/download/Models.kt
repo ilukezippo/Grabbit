@@ -14,6 +14,9 @@ data class DownloadSpec(
     val choice: Choice?,
     val isLive: Boolean = false,
     val direct: List<DirectItem> = emptyList(),
+    /** Set for a conversion job: the file to convert and the target extension ("mp3"). */
+    val convertFrom: SavedFile? = null,
+    val convertTo: String? = null,
 )
 
 data class DownloadTask(

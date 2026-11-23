@@ -100,7 +100,8 @@ Everything that changed is in the [changelog](CHANGELOG.md).
 - **Live streams:** record YouTube Live, Twitch, TikTok Live and more at full quality, saved as MP4
 - **Screen recorder:** records the screen with the sound apps play (Android 10+), with a floating bubble that shows the time and stops with a tap
 - **Converter:** turn any video or audio on your phone into MP3, M4A, OPUS, MP4, MKV, WEBM or GIF
-- **Downloads tab:** two at a time, progress and time left, cancel, retry, open and share, kept after a restart
+- **Downloads tab:** two at a time, progress and time left, a notification when done; tap to open, share, or **Edit** to convert, clear or delete several at once
+- **Ask or go:** pick the quality each time, or have shared links download straight away with your saved settings
 - **Updates built in:** checks this GitHub page when it starts and offers *Update*, which downloads the new version for you to install
 - **Arabic and English**, dark design
 - **No ads, no account, no tracking.** See the [privacy policy](PRIVACY.md)

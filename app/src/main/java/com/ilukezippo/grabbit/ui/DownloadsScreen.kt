@@ -1,6 +1,22 @@
 package com.ilukezippo.grabbit.ui
 
 import android.content.ActivityNotFoundException
+import android.app.Activity
+import android.os.Build
+import android.provider.MediaStore
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.text.font.FontWeight
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -51,15 +67,50 @@ fun formatSize(b: Long): String = when {
     b <= 0 -> ""; b < 1 shl 20 -> "%.0f KB".format(b / 1024.0); b < 1 shl 30 -> "%.1f MB".format(b / 1048576.0); else -> "%.2f GB".format(b / 1073741824.0)
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun DownloadsScreen() {
+fun DownloadsScreen(previewEditing: Boolean = false, previewSelected: Set<String> = emptySet()) {
     val ctx = LocalContext.current
+    val scope = rememberCoroutineScope()
     val tasks by Downloads.tasks.collectAsStateWithLifecycle()
-    Column(Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
-        Row(Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.tab_downloads), style = MaterialTheme.typography.headlineLarge, modifier = Modifier.weight(1f))
-            if (tasks.any { !it.active }) TextButton({ Downloads.clearFinished(ctx) }) { Text(stringResource(R.string.clear_finished)) }
+    var editing by remember { mutableStateOf(previewEditing) }
+    var selected by remember { mutableStateOf(previewSelected) }
+    var confirmDelete by remember { mutableStateOf(false) }
+    var showConvert by remember { mutableStateOf(false) }
+    var pendingConsent by remember { mutableStateOf(setOf<String>()) }
+    val selectable = tasks.filter { !it.active }
+    // Keep the selection to items that still exist and aren't running.
+    LaunchedEffect(tasks) { selected = selected.intersect(selectable.map { it.id }.toSet()) }
+    fun exitEdit() { editing = false; selected = emptySet() }
+    fun toggle(id: String) { selected = if (id in selected) selected - id else selected + id }
+
+    val consent = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { r ->
+        if (r.resultCode == Activity.RESULT_OK) {
+            Downloads.clear(ctx, pendingConsent)
+            Toast.makeText(ctx, R.string.deleted_toast, Toast.LENGTH_SHORT).show()
         }
+        pendingConsent = emptySet()
+    }
+
+    BackHandler(enabled = editing) { exitEdit() }
+
+    Column(Modifier.fillMaxSize()) {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 12.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (editing) {
+                Text(stringResource(R.string.n_selected, selected.size), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                TextButton({ selected = if (selected.size == selectable.size) emptySet() else selectable.map { it.id }.toSet() }) {
+                    Text(stringResource(R.string.select_all))
+                }
+                TextButton({ exitEdit() }) { Text(stringResource(R.string.edit_done)) }
+            } else {
+                Text(stringResource(R.string.tab_downloads), style = MaterialTheme.typography.headlineLarge, modifier = Modifier.weight(1f))
+                if (selectable.isNotEmpty()) TextButton({ editing = true }) {
+                    Icon(Icons.Rounded.Checklist, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.edit))
+                }
+            }
+        }
+        if (editing) Text(stringResource(R.string.edit_hint), color = G.muted, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 20.dp).padding(bottom = 8.dp))
+
         if (tasks.isEmpty()) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -70,22 +121,118 @@ fun DownloadsScreen() {
                     Text(stringResource(R.string.downloads_empty), color = G.muted, textAlign = TextAlign.Center)
                 }
             }
-        } else LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(bottom = 24.dp)) {
-            items(tasks, key = { it.id }) { TaskRow(it) }
+        } else LazyColumn(Modifier.weight(1f).padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(bottom = 24.dp)) {
+            items(tasks, key = { it.id }) { t ->
+                TaskRow(
+                    t, editing = editing, selected = t.id in selected,
+                    onToggle = { if (!t.active) toggle(t.id) },
+                    onLongPress = { if (!t.active) { editing = true; selected = selected + t.id } },
+                )
+            }
+        }
+
+        if (editing) {
+            val sel = tasks.filter { it.id in selected }
+            val convertible = sel.any { t -> t.status == Status.DONE && t.files.any { it.mime.startsWith("video") || it.mime.startsWith("audio") } }
+            Row(Modifier.fillMaxWidth().background(G.surface).padding(horizontal = 12.dp, vertical = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
+                BarAction(Icons.Rounded.Transform, stringResource(R.string.act_convert), enabled = convertible) { showConvert = true }
+                BarAction(Icons.Rounded.ClearAll, stringResource(R.string.act_clear), enabled = sel.isNotEmpty()) {
+                    Downloads.clear(ctx, selected)
+                    Toast.makeText(ctx, R.string.cleared_toast, Toast.LENGTH_SHORT).show()
+                    exitEdit()
+                }
+                BarAction(Icons.Rounded.DeleteOutline, stringResource(R.string.act_delete), enabled = sel.isNotEmpty(), tint = G.red) { confirmDelete = true }
+            }
+        }
+    }
+
+    if (confirmDelete) {
+        val n = tasks.filter { it.id in selected }.sumOf { it.files.size.coerceAtLeast(1) }
+        AlertDialog(
+            onDismissRequest = { confirmDelete = false },
+            icon = { Icon(Icons.Rounded.DeleteForever, null, tint = G.red) },
+            title = { Text(pluralStringResource(R.plurals.delete_title, n, n)) },
+            text = { Text(stringResource(R.string.delete_body)) },
+            confirmButton = {
+                TextButton({
+                    confirmDelete = false
+                    val ids = selected
+                    exitEdit()
+                    scope.launch {
+                        val out = Downloads.deleteFiles(ctx, ids)
+                        if (out.needConsent.isNotEmpty() && Build.VERSION.SDK_INT >= 30) {
+                            pendingConsent = out.consentIds
+                            val req = MediaStore.createDeleteRequest(ctx.contentResolver, out.needConsent)
+                            consent.launch(IntentSenderRequest.Builder(req.intentSender).build())
+                        } else withContext(Dispatchers.Main) {
+                            val msg = if (out.needConsent.isEmpty()) ctx.getString(R.string.deleted_toast)
+                                else ctx.getString(R.string.delete_some_failed, out.needConsent.size)
+                            Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }) { Text(stringResource(R.string.delete_confirm), color = G.red, fontWeight = FontWeight.Bold) }
+            },
+            dismissButton = { TextButton({ confirmDelete = false }) { Text(stringResource(R.string.cancel)) } },
+            containerColor = G.surface,
+        )
+    }
+
+    if (showConvert) {
+        var target by remember { mutableStateOf("mp3") }
+        ModalBottomSheet(onDismissRequest = { showConvert = false }, containerColor = G.bg) {
+            Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 28.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                Text(stringResource(R.string.convert_to_title), style = MaterialTheme.typography.titleLarge)
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf("mp3", "m4a", "opus", "mp4", "mkv", "webm", "gif").forEach { t -> ChoiceChip(t.uppercase(), target == t) { target = t } }
+                }
+                GradientButton({
+                    Downloads.convert(ctx, selected, target)
+                    Toast.makeText(ctx, R.string.convert_started, Toast.LENGTH_SHORT).show()
+                    showConvert = false
+                    exitEdit()
+                }, Modifier.fillMaxWidth()) {
+                    Icon(Icons.Rounded.AutoFixHigh, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.conv_start))
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun TaskRow(t: DownloadTask) {
+private fun BarAction(icon: ImageVector, label: String, enabled: Boolean, tint: androidx.compose.ui.graphics.Color = G.text, onClick: () -> Unit) {
+    Column(
+        Modifier.clip(RoundedCornerShape(14.dp)).clickable(enabled = enabled, onClick = onClick).padding(horizontal = 18.dp, vertical = 6.dp)
+            .alpha(if (enabled) 1f else .35f),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(icon, null, tint = tint)
+        Text(label, color = tint, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun TaskRow(t: DownloadTask, editing: Boolean, selected: Boolean, onToggle: () -> Unit, onLongPress: () -> Unit) {
     val ctx = LocalContext.current
     val openable = t.status == Status.DONE && t.files.isNotEmpty()
+    val shape = RoundedCornerShape(20.dp)
     Column(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(G.surface)
-            .then(if (openable) Modifier.clickable { openFile(ctx, t.files.first()) } else Modifier)
+        Modifier.fillMaxWidth().clip(shape).background(if (selected) G.violet.copy(alpha = .18f) else G.surface)
+            .then(if (selected) Modifier.border(1.5.dp, G.violet, shape) else Modifier)
+            .combinedClickable(
+                onClick = { if (editing) onToggle() else if (openable) openFile(ctx, t.files.first()) },
+                onLongClick = onLongPress,
+            )
             .padding(12.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
+            if (editing) {
+                Icon(
+                    if (selected) Icons.Rounded.CheckCircle else Icons.Rounded.RadioButtonUnchecked, null,
+                    tint = if (t.active) G.stroke else if (selected) G.violet else G.muted,
+                )
+                Spacer(Modifier.width(10.dp))
+            }
             Box(Modifier.size(64.dp, 48.dp).clip(RoundedCornerShape(12.dp)).background(G.surface2), contentAlignment = Alignment.Center) {
                 val thumb = t.spec.thumbnail ?: t.files.firstOrNull { it.mime.startsWith("image") || it.mime.startsWith("video") }?.uri
                 if (thumb != null) AsyncImage(thumb, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
@@ -115,20 +262,15 @@ private fun TaskRow(t: DownloadTask) {
             else LinearProgressIndicator(Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)), color = G.pink, trackColor = G.surface2)
         }
         t.error?.takeIf { t.status == Status.FAILED }?.let { Text(it, color = G.muted, fontSize = 12.sp, maxLines = 3, modifier = Modifier.padding(top = 8.dp)) }
-        Row(Modifier.fillMaxWidth().padding(top = 6.dp), horizontalArrangement = Arrangement.End) {
+        if (!editing) Row(Modifier.fillMaxWidth().padding(top = 6.dp), horizontalArrangement = Arrangement.End) {
             when (t.status) {
                 Status.QUEUED -> Action(Icons.Rounded.Close, stringResource(R.string.cancel)) { Downloads.stop(t.id) }
                 Status.RUNNING -> if (t.spec.isLive) Action(Icons.Rounded.Stop, stringResource(R.string.stop_save)) { Downloads.stop(t.id) }
                     else Action(Icons.Rounded.Close, stringResource(R.string.cancel)) { Downloads.stop(t.id) }
-                Status.DONE -> {
-                    Action(Icons.Rounded.Share, stringResource(R.string.share)) { shareFiles(ctx, t.files) }
-                    Action(Icons.Rounded.PlayArrow, stringResource(R.string.open)) { t.files.firstOrNull()?.let { openFile(ctx, it) } }
-                    Action(Icons.Rounded.DeleteOutline, stringResource(R.string.remove)) { Downloads.remove(ctx, t.id) }
-                }
-                Status.FAILED, Status.CANCELED -> {
-                    if (t.spec.choice != null || t.spec.direct.isNotEmpty()) Action(Icons.Rounded.Refresh, stringResource(R.string.retry)) { Downloads.retry(ctx, t.id) }
-                    Action(Icons.Rounded.DeleteOutline, stringResource(R.string.remove)) { Downloads.remove(ctx, t.id) }
-                }
+                Status.DONE -> Action(Icons.Rounded.Share, stringResource(R.string.share)) { shareFiles(ctx, t.files) }
+                Status.FAILED, Status.CANCELED ->
+                    if (t.spec.choice != null || t.spec.direct.isNotEmpty() || t.spec.convertTo != null)
+                        Action(Icons.Rounded.Refresh, stringResource(R.string.retry)) { Downloads.retry(ctx, t.id) }
             }
         }
     }

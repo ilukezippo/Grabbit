@@ -73,6 +73,19 @@ fun SettingsScreen() {
         }
 
         Section(Icons.Rounded.Tune, stringResource(R.string.set_defaults)) {
+            var auto by remember { mutableStateOf(prefs.autoDownload) }
+            SectionLabel(stringResource(R.string.when_grab))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ChoiceChip(stringResource(R.string.ask_every_time), !auto) { auto = false; prefs.autoDownload = false }
+                ChoiceChip(stringResource(R.string.download_right_away), auto) { auto = true; prefs.autoDownload = true }
+            }
+            Text(stringResource(if (auto) R.string.auto_hint_on else R.string.auto_hint_off), color = G.muted, fontSize = 13.sp)
+            SectionLabel(stringResource(R.string.mode_label))
+            var audioMode by remember { mutableStateOf(prefs.audioMode) }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ChoiceChip(stringResource(R.string.video), !audioMode) { audioMode = false; prefs.audioMode = false }
+                ChoiceChip(stringResource(R.string.audio), audioMode) { audioMode = true; prefs.audioMode = true }
+            }
             SectionLabel(stringResource(R.string.quality))
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf(0, 2160, 1080, 720, 480, 360).forEach { h ->
@@ -110,7 +123,7 @@ fun SettingsScreen() {
                 OutlinedButton({
                     checking = true; checkMsg = null
                     scope.launch {
-                        checkMsg = runCatching { AppUpdater.check(ctx, force = true) }.fold(
+                        checkMsg = runCatching { Prefs(ctx).skippedUpdate = null; AppUpdater.check(ctx, force = true) }.fold(
                             { if (it == null) ctx.getString(R.string.upd_latest, BuildConfigInfo.versionName(ctx)) else null },
                             { it.message ?: "Error" })
                         checking = false

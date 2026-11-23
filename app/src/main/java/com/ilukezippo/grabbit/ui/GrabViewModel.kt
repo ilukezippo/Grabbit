@@ -20,6 +20,8 @@ sealed interface GrabState {
     data object Loading : GrabState
     data class Loaded(val info: MediaInfo) : GrabState
     data class Error(val message: String) : GrabState
+    /** Downloaded straight away with the saved defaults; [label] like "1080p MP4". */
+    data class Queued(val info: MediaInfo, val label: String) : GrabState
 }
 
 class GrabViewModel(app: Application) : AndroidViewModel(app) {
@@ -34,11 +36,19 @@ class GrabViewModel(app: Application) : AndroidViewModel(app) {
             ?.takeIf { '.' in text && ' ' !in text.trim() }
         if (url == null) { _state.value = GrabState.Error(ctx.getString(R.string.err_no_link)); return }
         input.value = url
+        Prefs(ctx).lastGrabbed = url
         job?.cancel()
         job = viewModelScope.launch {
             _state.value = GrabState.Loading
             _state.value = try {
-                GrabState.Loaded(Resolver.resolve(ctx, url))
+                val info = Resolver.resolve(ctx, url)
+                val prefs = Prefs(ctx)
+                if (prefs.autoDownload && !info.isLive) {
+                    val choice = if (info.isDirect) null else prefs.defaultChoice(info.heights)
+                    Downloads.enqueue(ctx, DownloadSpec(info.url, info.title, info.thumbnail, choice, false, info.direct))
+                    GrabState.Queued(info, choice?.let { com.ilukezippo.grabbit.core.DefaultChoice.label(it) }
+                        ?: ctx.resources.getQuantityString(R.plurals.n_items, info.direct.size, info.direct.size))
+                } else GrabState.Loaded(info)
             } catch (e: Throwable) {
                 if (e is kotlinx.coroutines.CancellationException) throw e
                 GrabState.Error(e.message ?: ctx.getString(R.string.err_unsupported))

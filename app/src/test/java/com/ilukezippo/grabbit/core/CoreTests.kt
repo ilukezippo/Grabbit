@@ -103,3 +103,25 @@ class VersionsTest {
         assertNull(Versions.pickApk(listOf("notes.txt"), "arm64-v8a"))
     }
 }
+
+class DefaultChoiceTest {
+    private val hs = listOf(2160, 1080, 720, 360)
+    @Test fun picksSavedHeightOrNextLower() {
+        assertEquals(Choice.Video(1080, VideoContainer.MP4), DefaultChoice.pick(false, 1080, VideoContainer.MP4, AudioFormat.MP3, hs))
+        assertEquals(Choice.Video(720, VideoContainer.MKV), DefaultChoice.pick(false, 900, VideoContainer.MKV, AudioFormat.MP3, hs))
+        assertEquals(Choice.Video(360, VideoContainer.MP4), DefaultChoice.pick(false, 240, VideoContainer.MP4, AudioFormat.MP3, hs))
+    }
+    @Test fun bestWhenZeroOrUnknownHeights() {
+        assertEquals(Choice.Video(null, VideoContainer.MP4), DefaultChoice.pick(false, 0, VideoContainer.MP4, AudioFormat.MP3, hs))
+        assertEquals(Choice.Video(null, VideoContainer.WEBM), DefaultChoice.pick(false, 1080, VideoContainer.WEBM, AudioFormat.MP3, emptyList()))
+    }
+    @Test fun audioMode() {
+        assertEquals(Choice.Audio(AudioFormat.OPUS), DefaultChoice.pick(true, 1080, VideoContainer.MP4, AudioFormat.OPUS, hs))
+    }
+    @Test fun labels() {
+        assertEquals("1080p MP4", DefaultChoice.label(Choice.Video(1080, VideoContainer.MP4)))
+        assertEquals("4K MKV", DefaultChoice.label(Choice.Video(2160, VideoContainer.MKV)))
+        assertEquals("Best MP4", DefaultChoice.label(Choice.Video(null, VideoContainer.MP4)))
+        assertEquals("MP3", DefaultChoice.label(Choice.Audio(AudioFormat.MP3)))
+    }
+}

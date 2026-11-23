@@ -115,4 +115,40 @@
     <string name="err_ig_gone">This post isn\'t available. It may have been deleted, or the account is private and you don\'t follow it.</string>
     <string name="err_ig_failed">Instagram didn\'t return this. %s</string>
     <string name="err_ig_story_steps">Instagram didn\'t give Grabbit this story. Please send a screenshot of this message to the developer.\n\n%s</string>
+    <string name="edit">Edit</string>
+    <string name="edit_done">Done</string>
+    <string name="select_all">Select all</string>
+    <string name="n_selected">%d selected</string>
+    <string name="act_convert">Convert</string>
+    <string name="act_clear">Clear</string>
+    <string name="act_delete">Delete</string>
+    <plurals name="delete_title">
+        <item quantity="one">Delete %d file?</item>
+        <item quantity="other">Delete %d files?</item>
+    </plurals>
+    <string name="delete_body">They\'ll be removed from your phone, not just from this list. This can\'t be undone.</string>
+    <string name="delete_confirm">Delete from phone</string>
+    <string name="cleared_toast">Removed from the list. The files are still in Download/Grabbit.</string>
+    <string name="deleted_toast">Deleted from your phone.</string>
+    <string name="convert_to_title">Convert to</string>
+    <string name="convert_none">Pick videos or songs to convert.</string>
+    <string name="convert_started">Converting. The new files will appear in this list.</string>
+    <string name="edit_hint">Clear takes items off this list. Delete also removes the files from your phone.</string>
+    <string name="when_grab">When I grab a link</string>
+    <string name="ask_every_time">Ask every time</string>
+    <string name="download_right_away">Download right away</string>
+    <string name="auto_hint_off">You pick the quality and format for each download. Your last choice is remembered.</string>
+    <string name="auto_hint_on">Grabbit downloads straight away with the settings below. Live streams still ask first.</string>
+    <string name="mode_label">Download as</string>
+    <string name="auto_started">Downloading (%s)</string>
+    <plurals name="n_items">
+        <item quantity="one">%d item</item>
+        <item quantity="other">%d items</item>
+    </plurals>
+    <string name="no_clip_link">There\'s no link in your clipboard. Copy one first.</string>
+    <string name="delete_some_failed">%d files couldn\'t be deleted because they came from before Grabbit was reinstalled. Delete them in your Files app (Download/Grabbit).</string>
+    <string name="upd_later">Later</string>
+    <string name="ch_done">Finished downloads</string>
+    <string name="notif_done">Download complete · tap to open</string>
+    <string name="notif_failed">Download failed</string>
 </resources>
