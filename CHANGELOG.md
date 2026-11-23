@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.7 — 2026-11-23
+
+- **Record from the notification shade:** a quiet *Screen recorder* notification stays there with a **Record** button (turn it off in Tools)
+- **Quick Settings tile:** add *Grabbit Record* to your pull-down tiles; tap it to start or stop recording
+- **Countdown before recording:** Off, 3, 5 or 10 seconds, shown as a big number on screen; Stop during the countdown cancels
+
 ## 1.0.6 — 2026-11-23
 
 - **Edit downloads:** tap **Edit** (or long-press an item), select several or **Select all**, then **Convert**, **Clear** or **Delete**. *Clear* only takes items off the list; *Delete* also removes the files from your phone, after asking

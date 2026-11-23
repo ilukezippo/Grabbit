@@ -98,7 +98,7 @@ Everything that changed is in the [changelog](CHANGELOG.md).
 - **Instagram stories and private posts:** sign in once inside Grabbit; the login stays on your phone and is only sent to Instagram
 - **Share sheet:** Share → Grabbit from YouTube, Instagram, TikTok or any app opens a quick download sheet over it
 - **Live streams:** record YouTube Live, Twitch, TikTok Live and more at full quality, saved as MP4
-- **Screen recorder:** records the screen with the sound apps play (Android 10+), with a floating bubble that shows the time and stops with a tap
+- **Screen recorder:** records the screen with the sound apps play (Android 10+), with a countdown, a floating bubble that shows the time and stops with a tap, a Record button in the notification shade and a Quick Settings tile
 - **Converter:** turn any video or audio on your phone into MP3, M4A, OPUS, MP4, MKV, WEBM or GIF
 - **Downloads tab:** two at a time, progress and time left, a notification when done; tap to open, share, or **Edit** to convert, clear or delete several at once
 - **Ask or go:** pick the quality each time, or have shared links download straight away with your saved settings

@@ -11,6 +11,8 @@ object Notifications {
     const val ID_DOWNLOADS = 1001
     const val ID_RECORDER = 1002
     const val CH_DONE = "done"
+    const val CH_SHORTCUT = "shortcut"
+    const val ID_SHORTCUT = 1003
 
 
     fun createChannels(ctx: Context) {
@@ -19,6 +21,7 @@ object Notifications {
         nm.createNotificationChannel(NotificationChannel(CH_DOWNLOADS, ctx.getString(R.string.ch_downloads), NotificationManager.IMPORTANCE_LOW))
         nm.createNotificationChannel(NotificationChannel(CH_RECORDER, ctx.getString(R.string.ch_recorder), NotificationManager.IMPORTANCE_LOW))
         nm.createNotificationChannel(NotificationChannel(CH_DONE, ctx.getString(R.string.ch_done), NotificationManager.IMPORTANCE_DEFAULT))
+        nm.createNotificationChannel(NotificationChannel(CH_SHORTCUT, ctx.getString(R.string.ch_shortcut), NotificationManager.IMPORTANCE_LOW).apply { setShowBadge(false) })
     }
 
     /** "Download complete": tapping it opens the file. One notification per finished download. */
@@ -38,4 +41,26 @@ object Notifications {
             .build()
         runCatching { androidx.core.app.NotificationManagerCompat.from(ctx).notify(taskId.hashCode(), n) }
     }
+
+    /** A quiet notification that stays in the shade with a Record button. */
+    fun showRecorderShortcut(ctx: Context) {
+        val rec = android.app.PendingIntent.getActivity(ctx, 77,
+            android.content.Intent(ctx, com.ilukezippo.grabbit.recorder.RecordLauncherActivity::class.java).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK),
+            android.app.PendingIntent.FLAG_IMMUTABLE or android.app.PendingIntent.FLAG_UPDATE_CURRENT)
+        val app = android.app.PendingIntent.getActivity(ctx, 78, android.content.Intent(ctx, MainActivity::class.java),
+            android.app.PendingIntent.FLAG_IMMUTABLE or android.app.PendingIntent.FLAG_UPDATE_CURRENT)
+        val n = androidx.core.app.NotificationCompat.Builder(ctx, CH_SHORTCUT)
+            .setSmallIcon(R.drawable.ic_stat_rec)
+            .setContentTitle(ctx.getString(R.string.shortcut_title))
+            .setContentText(ctx.getString(R.string.shortcut_text))
+            .setContentIntent(rec)
+            .addAction(0, ctx.getString(R.string.shortcut_record), rec)
+            .addAction(0, ctx.getString(R.string.shortcut_open), app)
+            .setOngoing(true).setSilent(true).setShowWhen(false)
+            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_LOW)
+            .build()
+        runCatching { androidx.core.app.NotificationManagerCompat.from(ctx).notify(ID_SHORTCUT, n) }
+    }
+
+    fun hideRecorderShortcut(ctx: Context) = androidx.core.app.NotificationManagerCompat.from(ctx).cancel(ID_SHORTCUT)
 }

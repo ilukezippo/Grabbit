@@ -163,4 +163,18 @@
     <string name="ch_done">التنزيلات المكتملة</string>
     <string name="notif_done">اكتمل التنزيل · اضغط للفتح</string>
     <string name="notif_failed">فشل التنزيل</string>
+    <string name="rec_countdown">العد التنازلي قبل التسجيل</string>
+    <string name="off">إيقاف</string>
+    <string name="n_seconds">%d ث</string>
+    <string name="rec_starts_in">يبدأ التسجيل خلال %d…</string>
+    <string name="rec_shortcut">المسجّل في الإشعارات</string>
+    <string name="rec_shortcut_hint">ابدأ التسجيل من لوحة الإشعارات ومن أي تطبيق</string>
+    <string name="rec_add_tile">إضافة زر التسجيل إلى الإعدادات السريعة</string>
+    <string name="rec_tile_hint">نصيحة: أضف زر «Grabbit Record» إلى الإعدادات السريعة (عدّل الأزرار في لوحة الإشعارات).</string>
+    <string name="tile_label">Grabbit Record</string>
+    <string name="ch_shortcut">اختصار المسجّل</string>
+    <string name="shortcut_title">مسجّل الشاشة</string>
+    <string name="shortcut_text">اضغط «تسجيل» لبدء تسجيل الشاشة</string>
+    <string name="shortcut_record">تسجيل</string>
+    <string name="shortcut_open">فتح Grabbit</string>
 </resources>

@@ -57,14 +57,17 @@ class ScreenRecordService : Service() {
         const val EXTRA_CODE = "code"
         const val EXTRA_DATA = "data"
         const val EXTRA_AUDIO = "audio"
+        const val EXTRA_COUNTDOWN = "countdown"
         const val ACTION_STOP = "com.ilukezippo.grabbit.STOP_RECORDING"
 
         private val _recording = MutableStateFlow(0L) // start time (elapsedRealtime) or 0
         val recordingSince: StateFlow<Long> = _recording
+        private val _countdown = MutableStateFlow(0) // seconds left before recording starts, 0 = none
+        val countdown: StateFlow<Int> = _countdown
 
-        fun start(ctx: Context, code: Int, data: Intent, audio: Boolean) {
+        fun start(ctx: Context, code: Int, data: Intent, audio: Boolean, countdown: Int = 0) {
             ContextCompat.startForegroundService(ctx, Intent(ctx, ScreenRecordService::class.java)
-                .putExtra(EXTRA_CODE, code).putExtra(EXTRA_DATA, data).putExtra(EXTRA_AUDIO, audio))
+                .putExtra(EXTRA_CODE, code).putExtra(EXTRA_DATA, data).putExtra(EXTRA_AUDIO, audio).putExtra(EXTRA_COUNTDOWN, countdown))
         }
 
         fun stop(ctx: Context) = ctx.startService(Intent(ctx, ScreenRecordService::class.java).setAction(ACTION_STOP))
@@ -92,13 +95,16 @@ class ScreenRecordService : Service() {
         if (intent?.action == ACTION_STOP) { stopRecording(); return START_NOT_STICKY }
         val type = if (Build.VERSION.SDK_INT >= 29) ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION else 0
         ServiceCompat.startForeground(this, Notifications.ID_RECORDER, notification(), type)
-        if (running) return START_NOT_STICKY
+        if (running || counting) return START_NOT_STICKY
         val code = intent?.getIntExtra(EXTRA_CODE, Activity.RESULT_CANCELED) ?: Activity.RESULT_CANCELED
         @Suppress("DEPRECATION")
         val data: Intent? = if (Build.VERSION.SDK_INT >= 33) intent?.getParcelableExtra(EXTRA_DATA, Intent::class.java) else intent?.getParcelableExtra(EXTRA_DATA)
         if (code != Activity.RESULT_OK || data == null) { stopSelf(); return START_NOT_STICKY }
+        val wantAudio = intent!!.getBooleanExtra(EXTRA_AUDIO, true)
+        val seconds = intent.getIntExtra(EXTRA_COUNTDOWN, 0)
         try {
-            begin(code, data, intent!!.getBooleanExtra(EXTRA_AUDIO, true))
+            acquire(code, data)
+            if (seconds > 0) countdownThen(seconds) { safeBegin(wantAudio) } else begin(wantAudio)
         } catch (e: Throwable) {
             Toast.makeText(this, getString(R.string.rec_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
             cleanup(); stopSelf()
@@ -106,13 +112,72 @@ class ScreenRecordService : Service() {
         return START_NOT_STICKY
     }
 
-    private fun begin(code: Int, data: Intent, wantAudio: Boolean) {
+    /** Uses the screen-capture consent right away (it's single-use); recording starts later. */
+    private fun acquire(code: Int, data: Intent) {
         val mpm = getSystemService(MediaProjectionManager::class.java)
         val mp = mpm.getMediaProjection(code, data) ?: error("projection denied")
         projection = mp
         mp.registerCallback(object : MediaProjection.Callback() {
             override fun onStop() { ui.post { stopRecording() } }
         }, ui)
+    }
+
+    private fun safeBegin(wantAudio: Boolean) {
+        try { begin(wantAudio) } catch (e: Throwable) {
+            Toast.makeText(this, getString(R.string.rec_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
+            cleanup(); stopSelf()
+        }
+    }
+
+    // ---- countdown before recording ----
+    @Volatile private var counting = false
+    private var countView: TextView? = null
+
+    private fun countdownThen(seconds: Int, then: () -> Unit) {
+        counting = true
+        val d = resources.displayMetrics.density
+        val canOverlay = Build.VERSION.SDK_INT < 23 || Settings.canDrawOverlays(this)
+        if (canOverlay) {
+            val wm = getSystemService(WINDOW_SERVICE) as WindowManager
+            val tv = TextView(this).apply {
+                setTextColor(0xFFFFFFFF.toInt()); textSize = 64f; gravity = Gravity.CENTER
+                typeface = android.graphics.Typeface.DEFAULT_BOLD
+                background = GradientDrawable(GradientDrawable.Orientation.TL_BR, intArrayOf(0xEE8B5CF6.toInt(), 0xEEEC4899.toInt(), 0xEEF59E0B.toInt())).apply { shape = GradientDrawable.OVAL }
+            }
+            val size = (150 * d).toInt()
+            val type = if (Build.VERSION.SDK_INT >= 26) WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY else @Suppress("DEPRECATION") WindowManager.LayoutParams.TYPE_PHONE
+            val lp = WindowManager.LayoutParams(size, size, type,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, PixelFormat.TRANSLUCENT).apply { gravity = Gravity.CENTER }
+            runCatching { wm.addView(tv, lp); countView = tv }
+        } else {
+            Toast.makeText(this, getString(R.string.rec_starts_in, seconds), Toast.LENGTH_SHORT).show()
+        }
+        var left = seconds
+        val tick = object : Runnable {
+            override fun run() {
+                if (!counting) return
+                if (left <= 0) {
+                    hideCount(); counting = false; _countdown.value = 0
+                    // Let the countdown circle disappear before the first frame is captured.
+                    ui.postDelayed({ then() }, 250)
+                    return
+                }
+                _countdown.value = left
+                countView?.text = left.toString()
+                left--
+                ui.postDelayed(this, 1000)
+            }
+        }
+        ui.post(tick)
+    }
+
+    private fun hideCount() {
+        countView?.let { v -> runCatching { (getSystemService(WINDOW_SERVICE) as WindowManager).removeView(v) } }
+        countView = null
+    }
+
+    private fun begin(wantAudio: Boolean) {
+        val mp = projection ?: error("projection lost")
 
         val metrics = DisplayMetrics()
         @Suppress("DEPRECATION")
@@ -228,6 +293,7 @@ class ScreenRecordService : Service() {
     }
 
     private fun stopRecording() {
+        if (counting) { counting = false; _countdown.value = 0; hideCount() }
         if (!running) { cleanup(); stopSelf(); return }
         running = false
         _recording.value = 0
@@ -329,6 +395,7 @@ class ScreenRecordService : Service() {
     override fun onDestroy() {
         if (running) { running = false; cleanup() }
         hideBubble()
+        hideCount(); counting = false; _countdown.value = 0
         _recording.value = 0
         super.onDestroy()
     }

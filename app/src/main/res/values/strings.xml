@@ -151,4 +151,18 @@
     <string name="ch_done">Finished downloads</string>
     <string name="notif_done">Download complete · tap to open</string>
     <string name="notif_failed">Download failed</string>
+    <string name="rec_countdown">Countdown before recording</string>
+    <string name="off">Off</string>
+    <string name="n_seconds">%d s</string>
+    <string name="rec_starts_in">Recording starts in %d…</string>
+    <string name="rec_shortcut">Recorder in notifications</string>
+    <string name="rec_shortcut_hint">Start recording from the notification shade, from any app</string>
+    <string name="rec_add_tile">Add Record tile to Quick Settings</string>
+    <string name="rec_tile_hint">Tip: add the Grabbit Record tile to Quick Settings (edit your tiles in the pull-down shade).</string>
+    <string name="tile_label">Grabbit Record</string>
+    <string name="ch_shortcut">Recorder shortcut</string>
+    <string name="shortcut_title">Screen recorder</string>
+    <string name="shortcut_text">Tap Record to start recording your screen</string>
+    <string name="shortcut_record">Record</string>
+    <string name="shortcut_open">Open Grabbit</string>
 </resources>

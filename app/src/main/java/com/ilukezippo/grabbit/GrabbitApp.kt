@@ -22,6 +22,7 @@ class GrabbitApp : Application(), ImageLoaderFactory {
         super.onCreate()
         instance = this
         Notifications.createChannels(this)
+        if (com.ilukezippo.grabbit.ui.Prefs(this).recShortcut) Notifications.showRecorderShortcut(this)
         Downloads.loadHistory(this)
         scope.launch(Dispatchers.IO) { Engine.init(this@GrabbitApp) }
         scope.launch { runCatching { AppUpdater.check(this@GrabbitApp) } }

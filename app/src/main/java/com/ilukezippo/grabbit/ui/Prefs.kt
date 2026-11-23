@@ -27,6 +27,12 @@ class Prefs(ctx: Context) {
     /** An update version the user chose to skip ("Later"). */
     var skippedUpdate: String?
         get() = sp.getString("skipUpdate", null); set(v) = sp.edit().putString("skipUpdate", v).apply()
+    /** Seconds to count down before a screen recording starts (0 = off). */
+    var recCountdown: Int
+        get() = sp.getInt("recCountdown", 3); set(v) = sp.edit().putInt("recCountdown", v).apply()
+    /** Keep the "Screen recorder · Record" notification in the shade. */
+    var recShortcut: Boolean
+        get() = sp.getBoolean("recShortcut", true); set(v) = sp.edit().putBoolean("recShortcut", v).apply()
     var recordAudio: Boolean
         get() = sp.getBoolean("recAudio", true); set(v) = sp.edit().putBoolean("recAudio", v).apply()
 }

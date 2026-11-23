@@ -65,6 +65,24 @@
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 
+        <activity
+            android:name=".recorder.RecordLauncherActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity="com.ilukezippo.grabbit.record"
+            android:theme="@style/Theme.Grabbit.Translucent" />
+
+        <service
+            android:name=".recorder.RecordTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_stat_rec"
+            android:label="@string/tile_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
         <service
             android:name=".recorder.ScreenRecordService"
             android:exported="false"
